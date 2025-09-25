@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:vinculo/screens/landig_screen.dart';
 import 'package:vinculo/screens/register_screen.dart';
+import 'package:vinculo/utils/constants.dart';
 
 void main() {
   runApp(const MiApp());
@@ -10,13 +12,18 @@ class MiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Vinculo Vital',
+ return MaterialApp(
+      title: AppConstants.appName,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        primaryColor: AppConstants.primaryColor,
+        scaffoldBackgroundColor: AppConstants.backgroundColor,
+        fontFamily: 'Inter',
       ),
-      home: const RegistroScreen(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const LandingPage(),
+        '/registro': (context) => const RegistroScreen(), // Tu pantalla de registro anterior
+      },
       debugShowCheckedModeBanner: false,
     );
   }

@@ -1,129 +1,230 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
 
-class LandigScreen extends StatelessWidget {
-  const LandigScreen({Key? key}) : super(key: key);
+class LandingPage extends StatelessWidget {
+  const LandingPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.secondaryColor, // Usando el color secundario como fondo
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Área superior con ilustración
-            Expanded(
-              flex: 3,
+      backgroundColor: AppConstants.secondaryColor, // Color azul oscuro
+      body: Stack(
+        children: [
+          // Círculos decorativos de fondo
+          Positioned(
+            left: -146,
+            bottom: 200,
+            child: Opacity(
+              opacity: 0.05,
               child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(40),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Stack para las estrellas y la imagen principal
-                    Stack(
-                      alignment: Alignment.center,
+                width: 293.53,
+                height: 293.53,
+                decoration: const ShapeDecoration(
+                  color: Colors.white,
+                  shape: OvalBorder(),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            right: -146,
+            bottom: 200,
+            child: Opacity(
+              opacity: 0.05,
+              child: Container(
+                width: 293.53,
+                height: 293.53,
+                decoration: const ShapeDecoration(
+                  color: Colors.white,
+                  shape: OvalBorder(),
+                ),
+              ),
+            ),
+          ),
+          
+          // Contenedor blanco inferior
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              height: 310,
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              decoration: const ShapeDecoration(
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
+                  ),
+                ),
+              ),
+              child: Column(
+                children: [
+                  // Área de texto principal
+                  Container(
+                    width: double.infinity,
+                    height: 193,
+                    padding: const EdgeInsets.only(top: 27),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Imagen principal de personas en el banco
-                        Container(
-                          width: 220,
-                          height: 140,
-                          child: Image.asset(
-                            'assets/images/people_on_bench.png', // Coloca tu imagen aquí
-                            fit: BoxFit.contain,
+                        // Título principal con texto destacado
+                        SizedBox(
+                          width: 325,
+                          child: Text.rich(
+                            TextSpan(
+                              children: [
+                                const TextSpan(
+                                  text: 'Comencemos a ',
+                                  style: TextStyle(
+                                    color: Color(0xFF0C0A1C),
+                                    fontSize: 28,
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.50,
+                                    letterSpacing: 0.42,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: 'Crecer',
+                                  style: TextStyle(
+                                    color: AppConstants.primaryColor,
+                                    fontSize: 28,
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.50,
+                                    letterSpacing: 0.42,
+                                  ),
+                                ),
+                                const TextSpan(
+                                  text: ' Nuestras Habilidades',
+                                  style: TextStyle(
+                                    color: Color(0xFF0C0A1C),
+                                    fontSize: 28,
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.50,
+                                    letterSpacing: 0.42,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 8),
+                        
+                        // Subtítulo
+                        SizedBox(
+                          width: 265,
+                          child: Opacity(
+                            opacity: 0.65,
+                            child: const Text(
+                              'La app que conecta generaciones para aprender, crecer y compartir experiencias juntos.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Color(0xFF1B163F),
+                                fontSize: 12,
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w300,
+                                height: 1.50,
+                                letterSpacing: 0.18,
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-            ),
-            
-            // Área inferior con contenido
-            Expanded(
-              flex: 2,
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: AppConstants.backgroundColor,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    topRight: Radius.circular(24),
                   ),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppConstants.largePadding + 8,
-                  vertical: AppConstants.largePadding + 8,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    // Título principal
-                    Text(
-                      'Comencemos a Crecer\nNuestras Habilidades',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppConstants.textColor,
-                        height: 1.3,
-                      ),
-                    ),
-                    
-                    // Subtítulo
-                    Text(
-                      'Tu tiempo de crecimiento y desarrollo personal\nempieza.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: AppConstants.textColor.withOpacity(0.6),
-                        height: 1.4,
-                      ),
-                    ),
-                    
-                    // Botón Comenzar
-                    Container(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Acción del botón
-                          print('Comenzar');
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppConstants.primaryColor,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(26),
+                  
+                  // Área inferior con logo y botón
+                  Container(
+                    height: 87,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Logo/Avatar circular
+                        Container(
+                          width: 105,
+                          height: 105,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: const DecorationImage(
+                              image: AssetImage('assets/images/app_avatar.png'), // Tu logo/avatar
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
-                        child: const Text(
-                          'Comenzar',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
+                        
+                        const SizedBox(width: 16),
+                        
+                        // Botón Comenzar
+                        Container(
+                          width: 221,
+                          padding: const EdgeInsets.all(16),
+                          decoration: ShapeDecoration(
+                            color: AppConstants.primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              // Navegación a la siguiente pantalla
+                              Navigator.pushNamed(context, '/registro');
+                            },
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Comenzar',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.50,
+                                    letterSpacing: 0.24,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                    
-                    // Logo de la aplicación
-                    Container(
-                      width: 40,
-                      height: 40,
-                      child: Image.asset(
-                        'assets/images/logo.png', // Coloca tu logo aquí
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+          
+          // Imagen principal de las personas en el banco (ENCIMA del área blanca)
+          Positioned(
+            left: 18,
+            bottom: 170, // Ajustado para que se superponga sobre el área blanca
+            child: Container(
+              width: MediaQuery.of(context).size.width - 36,
+              height: 280, // Altura reducida para mejor proporción
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                image: const DecorationImage(
+                  image: AssetImage('assets/images/people_on_bench_large.png'), // Tu imagen principal
+                  fit: BoxFit.cover,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
