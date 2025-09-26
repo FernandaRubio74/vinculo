@@ -150,9 +150,8 @@ class LandingPage extends StatelessWidget {
                           width: 105,
                           height: 105,
                           decoration: BoxDecoration(
-                            shape: BoxShape.circle,
                             image: const DecorationImage(
-                              image: AssetImage('assets/images/app_avatar.png'), // Tu logo/avatar
+                              image: AssetImage('assets/images/logo.png'), // Tu logo/avatar
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -203,24 +202,17 @@ class LandingPage extends StatelessWidget {
           
           // Imagen principal de las personas en el banco (ENCIMA del área blanca)
           Positioned(
-            left: 18,
-            bottom: 170, // Ajustado para que se superponga sobre el área blanca
+            left: 10,
+            bottom: 250, // Ajustado para que se superponga sobre el área blanca
             child: Container(
-              width: MediaQuery.of(context).size.width - 36,
-              height: 280, // Altura reducida para mejor proporción
+              width: MediaQuery.of(context).size.width,
+              height: 400, // Altura reducida para mejor proporción
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 image: const DecorationImage(
                   image: AssetImage('assets/images/people_on_bench_large.png'), // Tu imagen principal
                   fit: BoxFit.cover,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
               ),
             ),
           ),
