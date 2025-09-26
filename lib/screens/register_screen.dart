@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:vinculo/utils/constants.dart';
 
-class RegistroScreen extends StatefulWidget {
-  const RegistroScreen({Key? key}) : super(key: key);
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({Key? key}) : super(key: key);
 
   @override
-  State<RegistroScreen> createState() => _RegistroScreenState();
+  State<RegisterScreen> createState() => _RegistroScreenState();
 }
 
-class _RegistroScreenState extends State<RegistroScreen> {
+class _RegistroScreenState extends State<RegisterScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 

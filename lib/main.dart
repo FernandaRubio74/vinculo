@@ -22,7 +22,7 @@ class MiApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const LandingPage(),
-        '/registro': (context) => const RegistroScreen(), // Tu pantalla de registro anterior
+        '/registro': (context) => const RegisterScreen(), // Tu pantalla de registro anterior
       },
       debugShowCheckedModeBanner: false,
     );
