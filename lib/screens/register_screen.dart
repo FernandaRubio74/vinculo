@@ -9,17 +9,27 @@ class RegistroScreen extends StatefulWidget {
 }
 
 class _RegistroScreenState extends State<RegistroScreen> {
-  final _nombreController = TextEditingController(text: 'Fernanda Rubio');
-  final _correoController = TextEditingController(text: 'fernandarubio@gmail.com');
-  final _fechaController = TextEditingController(text: '18/03/2006');
-  final _telefonoController = TextEditingController(text: '(503) 4545-7878');
-  final _passwordController = TextEditingController(text: '*******');
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
+  // Controladores para la primera página
+  final _nombreController = TextEditingController();
+  final _correoController = TextEditingController();
+  final _fechaController = TextEditingController();
+  final _telefonoController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+
+  // Controladores para la segunda página
+  final _ciudadController = TextEditingController();
+  final _institucionController = TextEditingController();
+  final _nivelAcademicoController = TextEditingController();
+  String? _selectedProfileImage;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.accentColor, // Color rojo de fondo
+      backgroundColor: AppConstants.accentColor,
       body: Stack(
         children: [
           // Círculos decorativos de fondo
@@ -53,7 +63,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
               ),
             ),
           ),
-          
+
           // Contenido principal
           SafeArea(
             child: Center(
@@ -75,7 +85,16 @@ class _RegistroScreenState extends State<RegistroScreen> {
                       Align(
                         alignment: Alignment.topLeft,
                         child: GestureDetector(
-                          onTap: () => Navigator.pop(context),
+                          onTap: () {
+                            if (_currentPage == 0) {
+                              Navigator.pop(context);
+                            } else {
+                              _pageController.previousPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                          },
                           child: Container(
                             width: 24,
                             height: 24,
@@ -87,160 +106,50 @@ class _RegistroScreenState extends State<RegistroScreen> {
                           ),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
-                      // Header - Título y subtítulo
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+
+                      // Indicador de progreso
+                      Row(
                         children: [
-                          const Text(
-                            'Registrarse',
-                            style: TextStyle(
-                              color: Color(0xFF111827),
-                              fontSize: 32,
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w700,
-                              height: 1.30,
-                              letterSpacing: -0.64,
+                          Expanded(
+                            child: Container(
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: _currentPage >= 0 ? AppConstants.accentColor : const Color(0xFFEDF1F3),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              const Text(
-                                'Ya tienes una cuenta?',
-                                style: TextStyle(
-                                  color: Color(0xFF6C7278),
-                                  fontSize: 12,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.40,
-                                  letterSpacing: -0.12,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              GestureDetector(
-                                onTap: () {
-                                  // Navegar a login
-                                },
-                                child: const Text(
-                                  'Inicia Sesión',
-                                  style: TextStyle(
-                                    color: Color(0xFF4D81E7),
-                                    fontSize: 12,
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w600,
-                                    height: 1.40,
-                                    letterSpacing: -0.12,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      
-                      const SizedBox(height: 24),
-                      
-                      // Formulario
-                      Column(
-                        children: [
-                          // Campo Nombre Completo
-                          _buildTextField(
-                            label: 'Nombre Completo',
-                            controller: _nombreController,
-                          ),
-                          
-                          const SizedBox(height: 16),
-                          
-                          // Campo Correo
-                          _buildTextField(
-                            label: 'Correo',
-                            controller: _correoController,
-                          ),
-                          
-                          const SizedBox(height: 16),
-                          
-                          // Campo Fecha de Nacimiento
-                          _buildTextField(
-                            label: 'Fecha de Nacimiento',
-                            controller: _fechaController,
-                            suffixIcon: const Icon(
-                              Icons.calendar_today,
-                              size: 16,
-                              color: Color(0xFF6C7278),
-                            ),
-                          ),
-                          
-                          const SizedBox(height: 16),
-                          
-                          // Campo Teléfono
-                          _buildPhoneField(),
-                          
-                          const SizedBox(height: 16),
-                          
-                          // Campo Contraseña
-                          _buildTextField(
-                            label: 'Contraseña',
-                            controller: _passwordController,
-                            obscureText: _obscurePassword,
-                            suffixIcon: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
-                              child: Icon(
-                                _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                                size: 16,
-                                color: const Color(0xFF6C7278),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Container(
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: _currentPage >= 1 ? AppConstants.accentColor : const Color(0xFFEDF1F3),
+                                borderRadius: BorderRadius.circular(2),
                               ),
                             ),
                           ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
-                      // Botón Siguiente
-                      Container(
-                        width: double.infinity,
-                        height: 46,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Acción del botón
-                            print('Siguiente pressed');
+
+                      // PageView para las dos páginas
+                      SizedBox(
+                        height: 600,
+                        child: PageView(
+                          controller: _pageController,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentPage = index;
+                            });
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppConstants.accentColor,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'Siguiente',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.40,
-                                  letterSpacing: -0.14,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              const Icon(
-                                Icons.arrow_forward,
-                                color: Colors.white,
-                                size: 18,
-                              ),
-                            ],
-                          ),
+                          children: [
+                            _buildFirstPage(),
+                            _buildSecondPage(),
+                          ],
                         ),
                       ),
                     ],
@@ -254,11 +163,431 @@ class _RegistroScreenState extends State<RegistroScreen> {
     );
   }
 
+  Widget _buildFirstPage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header - Título y subtítulo
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Registrarse',
+              style: TextStyle(
+                color: Color(0xFF111827),
+                fontSize: 32,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w700,
+                height: 1.30,
+                letterSpacing: -0.64,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Text(
+                  'Ya tienes una cuenta?',
+                  style: TextStyle(
+                    color: Color(0xFF6C7278),
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    height: 1.40,
+                    letterSpacing: -0.12,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                GestureDetector(
+                  onTap: () {
+                    // Navegar a login
+                  },
+                  child: const Text(
+                    'Inicia Sesión',
+                    style: TextStyle(
+                      color: Color(0xFF4D81E7),
+                      fontSize: 12,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w600,
+                      height: 1.40,
+                      letterSpacing: -0.12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 24),
+
+        // Formulario Primera Página
+        Expanded(
+          child: Column(
+            children: [
+              // Campo Nombre Completo
+              _buildTextField(
+                label: 'Nombre Completo',
+                controller: _nombreController,
+                hintText: 'Ingresa tu nombre completo',
+              ),
+
+              const SizedBox(height: 16),
+
+              // Campo Correo
+              _buildTextField(
+                label: 'Correo',
+                controller: _correoController,
+                hintText: 'ejemplo@correo.com',
+              ),
+
+              const SizedBox(height: 16),
+
+              // Campo Fecha de Nacimiento
+              _buildTextField(
+                label: 'Fecha de Nacimiento',
+                controller: _fechaController,
+                hintText: 'DD/MM/AAAA',
+                suffixIcon: const Icon(
+                  Icons.calendar_today,
+                  size: 16,
+                  color: Color(0xFF6C7278),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Campo Teléfono
+              _buildPhoneField(),
+
+              const SizedBox(height: 16),
+
+              // Campo Contraseña
+              _buildTextField(
+                label: 'Contraseña',
+                controller: _passwordController,
+                hintText: 'Ingresa tu contraseña',
+                obscureText: _obscurePassword,
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                  child: Icon(
+                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    size: 16,
+                    color: const Color(0xFF6C7278),
+                  ),
+                ),
+              ),
+
+              const Spacer(),
+
+              // Botón Siguiente
+              Container(
+                width: double.infinity,
+                height: 46,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_validateFirstPage()) {
+                      _pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppConstants.accentColor,
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Siguiente',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w500,
+                          height: 1.40,
+                          letterSpacing: -0.14,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Icon(
+                        Icons.arrow_forward,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSecondPage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header - Título
+        const Text(
+          'Registrarse',
+          style: TextStyle(
+            color: Color(0xFF111827),
+            fontSize: 32,
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w700,
+            height: 1.30,
+            letterSpacing: -0.64,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            const Text(
+              'Ya tienes una cuenta?',
+              style: TextStyle(
+                color: Color(0xFF6C7278),
+                fontSize: 12,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w500,
+                height: 1.40,
+                letterSpacing: -0.12,
+              ),
+            ),
+            const SizedBox(width: 6),
+            GestureDetector(
+              onTap: () {
+                // Navegar a login
+              },
+              child: const Text(
+                'Inicia Sesión',
+                style: TextStyle(
+                  color: Color(0xFF4D81E7),
+                  fontSize: 12,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                  height: 1.40,
+                  letterSpacing: -0.12,
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 24),
+
+        // Formulario Segunda Página
+        Expanded(
+          child: Column(
+            children: [
+              // Campo Foto de perfil
+              _buildSelectField(
+                label: 'Foto de perfil',
+                value: _selectedProfileImage ?? 'Seleccionar',
+                onTap: () {
+                  _selectProfileImage();
+                },
+                showIcon: true,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Campo Ciudad/Región
+              _buildSelectField(
+                label: 'Ciudad/Región',
+                value: _ciudadController.text.isEmpty ? 'Seleccionar' : _ciudadController.text,
+                onTap: () {
+                  _selectCity();
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // Campo Institución educativa
+              _buildSelectField(
+                label: 'Institución educativa (escuela/universidad)',
+                value: _institucionController.text.isEmpty ? 'Seleccionar' : _institucionController.text,
+                onTap: () {
+                  _selectInstitution();
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // Campo Nivel académico
+              _buildSelectField(
+                label: 'Nivel académico (secundaria/universidad/técnico)',
+                value: _nivelAcademicoController.text.isEmpty ? 'Seleccionar' : _nivelAcademicoController.text,
+                onTap: () {
+                  _selectAcademicLevel();
+                },
+              ),
+
+              const Spacer(),
+
+              // Botón Siguiente
+              Container(
+                width: double.infinity,
+                height: 46,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_validateSecondPage()) {
+                      _createAccount();
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppConstants.accentColor,
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Siguiente',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w500,
+                          height: 1.40,
+                          letterSpacing: -0.14,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Icon(
+                        Icons.arrow_forward,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSelectField({
+    required String label,
+    required String value,
+    required VoidCallback onTap,
+    bool showIcon = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Label
+        Container(
+          height: 21,
+          decoration: const ShapeDecoration(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(100)),
+            ),
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF6C7278),
+              fontSize: 12,
+              fontFamily: 'Plus Jakarta Sans',
+              fontWeight: FontWeight.w500,
+              height: 1.60,
+              letterSpacing: -0.24,
+            ),
+          ),
+        ),
+        const SizedBox(height: 2),
+        
+        // Campo seleccionable
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: double.infinity,
+            height: 46,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12.5),
+            clipBehavior: Clip.antiAlias,
+            decoration: ShapeDecoration(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                side: const BorderSide(
+                  width: 1,
+                  color: Color(0xFFEDF1F3),
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              shadows: const [
+                BoxShadow(
+                  color: Color(0x3DE4E5E7),
+                  blurRadius: 2,
+                  offset: Offset(0, 1),
+                  spreadRadius: 0,
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                if (showIcon) ...[
+                  Container(
+                    width: 16,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                    child: const Icon(
+                      Icons.person,
+                      size: 12,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                ],
+                Expanded(
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      color: value == 'Seleccionar' 
+                          ? const Color(0xFF9CA3AF) 
+                          : const Color(0xFF1A1C1E),
+                      fontSize: 14,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
+                      height: 1.40,
+                      letterSpacing: -0.14,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildTextField({
     required String label,
     required TextEditingController controller,
+    String? hintText,
     bool obscureText = false,
     Widget? suffixIcon,
+    int maxLines = 1,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,10 +605,10 @@ class _RegistroScreenState extends State<RegistroScreen> {
           ),
         ),
         const SizedBox(height: 2),
-        
+
         // Campo de texto
         Container(
-          height: 46,
+          height: maxLines > 1 ? null : 46,
           decoration: ShapeDecoration(
             color: Colors.white,
             shape: RoundedRectangleBorder(
@@ -301,6 +630,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
           child: TextFormField(
             controller: controller,
             obscureText: obscureText,
+            maxLines: maxLines,
             style: const TextStyle(
               color: Color(0xFF1A1C1E),
               fontSize: 14,
@@ -310,9 +640,21 @@ class _RegistroScreenState extends State<RegistroScreen> {
               letterSpacing: -0.14,
             ),
             decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12.5),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: maxLines > 1 ? 12 : 12.5,
+              ),
               border: InputBorder.none,
               suffixIcon: suffixIcon,
+              hintText: hintText,
+              hintStyle: const TextStyle(
+                color: Color(0xFF9CA3AF),
+                fontSize: 14,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                height: 1.40,
+                letterSpacing: -0.14,
+              ),
             ),
           ),
         ),
@@ -337,7 +679,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
           ),
         ),
         const SizedBox(height: 2),
-        
+
         // Campo de teléfono con código de país
         Container(
           height: 46,
@@ -378,7 +720,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Bandera de El Salvador (puedes usar una imagen)
+                    // Bandera de El Salvador
                     Container(
                       width: 18,
                       height: 12,
@@ -396,7 +738,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
                   ],
                 ),
               ),
-              
+
               // Campo de número
               Expanded(
                 child: TextFormField(
@@ -412,6 +754,15 @@ class _RegistroScreenState extends State<RegistroScreen> {
                   decoration: const InputDecoration(
                     contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12.5),
                     border: InputBorder.none,
+                    hintText: '0000-0000',
+                    hintStyle: TextStyle(
+                      color: Color(0xFF9CA3AF),
+                      fontSize: 14,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      height: 1.40,
+                      letterSpacing: -0.14,
+                    ),
                   ),
                 ),
               ),
@@ -422,13 +773,226 @@ class _RegistroScreenState extends State<RegistroScreen> {
     );
   }
 
+  bool _validateFirstPage() {
+    if (_nombreController.text.isEmpty ||
+        _correoController.text.isEmpty ||
+        _fechaController.text.isEmpty ||
+        _telefonoController.text.isEmpty ||
+        _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor completa todos los campos'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return false;
+    }
+    return true;
+  }
+
+  bool _validateSecondPage() {
+    if (_selectedProfileImage == null ||
+        _ciudadController.text.isEmpty ||
+        _institucionController.text.isEmpty ||
+        _nivelAcademicoController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor completa todos los campos'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return false;
+    }
+    return true;
+  }
+
+  void _selectProfileImage() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Cámara'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _selectedProfileImage = 'Imagen de cámara';
+                });
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Galería'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _selectedProfileImage = 'Imagen de galería';
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _selectCity() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Seleccionar Ciudad'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('San Salvador'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _ciudadController.text = 'San Salvador';
+                });
+              },
+            ),
+            ListTile(
+              title: const Text('Santa Ana'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _ciudadController.text = 'Santa Ana';
+                });
+              },
+            ),
+            ListTile(
+              title: const Text('San Miguel'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _ciudadController.text = 'San Miguel';
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _selectInstitution() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Seleccionar Institución'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('Universidad de El Salvador'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _institucionController.text = 'Universidad de El Salvador';
+                });
+              },
+            ),
+            ListTile(
+              title: const Text('Universidad Centroamericana'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _institucionController.text = 'Universidad Centroamericana';
+                });
+              },
+            ),
+            ListTile(
+              title: const Text('Escuela Superior de Economía y Negocios'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _institucionController.text = 'Escuela Superior de Economía y Negocios';
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _selectAcademicLevel() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Seleccionar Nivel Académico'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('Secundaria'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _nivelAcademicoController.text = 'Secundaria';
+                });
+              },
+            ),
+            ListTile(
+              title: const Text('Técnico'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _nivelAcademicoController.text = 'Técnico';
+                });
+              },
+            ),
+            ListTile(
+              title: const Text('Universidad'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _nivelAcademicoController.text = 'Universidad';
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _createAccount() {
+    print('Crear cuenta:');
+    print('Nombre: ${_nombreController.text}');
+    print('Correo: ${_correoController.text}');
+    print('Fecha: ${_fechaController.text}');
+    print('Teléfono: ${_telefonoController.text}');
+    print('Foto: $_selectedProfileImage');
+    print('Ciudad: ${_ciudadController.text}');
+    print('Institución: ${_institucionController.text}');
+    print('Nivel Académico: ${_nivelAcademicoController.text}');
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Cuenta creada exitosamente'),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
   @override
   void dispose() {
+    _pageController.dispose();
     _nombreController.dispose();
     _correoController.dispose();
     _fechaController.dispose();
     _telefonoController.dispose();
     _passwordController.dispose();
+    _ciudadController.dispose();
+    _institucionController.dispose();
+    _nivelAcademicoController.dispose();
     super.dispose();
   }
 }
