@@ -46,7 +46,7 @@ class VolunteerHomeScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 20), // Reducido de 24
 
             // Sección de Conexiones Destacadas
             _buildSectionTitle('Conexiones Destacadas'),
@@ -57,26 +57,26 @@ class VolunteerHomeScreen extends StatelessWidget {
             const SizedBox(height: 16),
             _buildViewConnectionsButton(context),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 20), // Reducido de 24
 
             // Sección de Anuncios para Voluntarios
             _buildSectionTitle('Anuncios para Voluntarios'),
             const SizedBox(height: 12),
             _buildAnnouncementCard(),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 20), // Reducido de 24
 
             // Sección de Progreso de Recompensas
             _buildSectionTitle('Progreso de Recompensas'),
             const SizedBox(height: 12),
             _buildRewardsProgress(),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 20), // Reducido de 24
 
             // Acciones rápidas mejoradas
             _buildQuickActions(context),
 
-            const SizedBox(height: 100), // Espacio para la navegación inferior
+            const SizedBox(height: 20), // Reducido significativamente de 100
           ],
         ),
       ),
@@ -104,21 +104,21 @@ class VolunteerHomeScreen extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: 100,
+      height: 90, // Reducido de 100
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: connections.length,
         itemBuilder: (context, index) {
           final connection = connections[index];
           return Container(
-            width: 90,
+            width: 85, // Reducido de 90
             margin: const EdgeInsets.only(right: 12),
             child: Column(
               children: [
                 // Avatar circular
                 Container(
-                  width: 60,
-                  height: 60,
+                  width: 50, // Reducido de 60
+                  height: 50, // Reducido de 60
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.grey.shade300,
@@ -129,32 +129,34 @@ class VolunteerHomeScreen extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.person,
-                    size: 30,
+                    size: 25, // Reducido de 30
                     color: Colors.grey.shade600,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6), // Reducido de 8
                 // Nombre
                 Text(
                   connection['name']!,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 13, // Reducido de 14
                     fontWeight: FontWeight.w600,
                     color: AppConstants.textColor,
                     fontFamily: 'Public Sans',
                   ),
                 ),
                 // Estado
-                Text(
-                  connection['status']!,
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: AppConstants.textColor.withOpacity(0.7),
-                    fontFamily: 'Public Sans',
+                Flexible(
+                  child: Text(
+                    connection['status']!,
+                    style: TextStyle(
+                      fontSize: 9, // Reducido de 10
+                      color: AppConstants.textColor.withOpacity(0.7),
+                      fontFamily: 'Public Sans',
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -175,7 +177,7 @@ class VolunteerHomeScreen extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppConstants.primaryColor,
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: 14), // Reducido de 16
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -196,7 +198,7 @@ class VolunteerHomeScreen extends StatelessWidget {
 
   Widget _buildAnnouncementCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14), // Reducido de 16
       decoration: BoxDecoration(
         color: Colors.blue.shade50,
         borderRadius: BorderRadius.circular(12),
@@ -205,25 +207,21 @@ class VolunteerHomeScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade200,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  'Nueva Capacitación Disponible',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.blue,
-                    fontFamily: 'Public Sans',
-                  ),
-                ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade200,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Text(
+              'Nueva Capacitación Disponible',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.blue,
+                fontFamily: 'Public Sans',
               ),
-            ],
+            ),
           ),
           const SizedBox(height: 8),
           const Text(
@@ -257,7 +255,7 @@ class VolunteerHomeScreen extends StatelessWidget {
 
   Widget _buildRewardsProgress() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14), // Reducido de 16
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(12),
@@ -269,13 +267,15 @@ class VolunteerHomeScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Próxima Recompensa: Vale de Café',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppConstants.textColor,
-                  fontFamily: 'Public Sans',
+              const Flexible(
+                child: Text(
+                  'Próxima Recompensa: Vale de Café',
+                  style: TextStyle(
+                    fontSize: 15, // Reducido de 16
+                    fontWeight: FontWeight.w600,
+                    color: AppConstants.textColor,
+                    fontFamily: 'Public Sans',
+                  ),
                 ),
               ),
               Text(
@@ -289,7 +289,7 @@ class VolunteerHomeScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10), // Reducido de 12
           // Barra de progreso
           Container(
             height: 8,
@@ -308,7 +308,7 @@ class VolunteerHomeScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6), // Reducido de 8
           Text(
             'Puntos',
             style: TextStyle(
@@ -317,7 +317,7 @@ class VolunteerHomeScreen extends StatelessWidget {
               fontFamily: 'Public Sans',
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4), // Reducido de 8
           Text(
             '¡Sigue así! Estás a solo 25 puntos de tu recompensa.',
             style: TextStyle(
@@ -389,8 +389,8 @@ class VolunteerHomeScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 80,
-        padding: const EdgeInsets.all(16),
+        height: 80, // Volver a altura original
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Padding más específico
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(12),
@@ -398,18 +398,23 @@ class VolunteerHomeScreen extends StatelessWidget {
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min, // Importante para evitar overflow
           children: [
-            Icon(icon, size: 24, color: iconColor),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: iconColor,
-                fontFamily: 'Public Sans',
+            Icon(icon, size: 20, color: iconColor), // Tamaño más pequeño
+            const SizedBox(height: 6),
+            Flexible( // Permite que el texto se ajuste
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 10, // Más pequeño
+                  fontWeight: FontWeight.w600,
+                  color: iconColor,
+                  fontFamily: 'Public Sans',
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2, // Máximo 2 líneas
+                overflow: TextOverflow.ellipsis,
               ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),

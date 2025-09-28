@@ -96,7 +96,6 @@ class ContactProfileScreen extends StatelessWidget {
                 decoration: const BoxDecoration(
                   color: Colors.green,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
                 ),
               ),
             ),

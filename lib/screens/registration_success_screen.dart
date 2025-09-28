@@ -133,10 +133,8 @@ class RegistrationSuccessScreen extends StatelessWidget {
               ),
             ),
             
-            const SizedBox(height: 16),
-            
-            // Navegación inferior (si la necesitas)
-            _buildBottomNavigation(context),
+            // Espacio inferior para el safe area
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
           ],
         ),
       ),
@@ -167,73 +165,5 @@ class RegistrationSuccessScreen extends StatelessWidget {
         (route) => false,
       );
     }
-  }
-
-  Widget _buildBottomNavigation(BuildContext context) {
-    return Container(
-      height: 80,
-      decoration: BoxDecoration(
-        color: AppConstants.backgroundColor,
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200, width: 1),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(
-            icon: Icons.home,
-            label: 'Inicio',
-            isActive: true,
-          ),
-          _buildNavItem(
-            icon: Icons.person_outline,
-            label: 'Perfil',
-            isActive: false,
-          ),
-          _buildNavItem(
-            icon: Icons.notifications_outlined,
-            label: 'Actividades',
-            isActive: false,
-          ),
-          _buildNavItem(
-            icon: Icons.card_giftcard,
-            label: 'Recompensas',
-            isActive: false,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem({
-    required IconData icon,
-    required String label,
-    required bool isActive,
-  }) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          icon,
-          color: isActive
-              ? AppConstants.primaryColor
-              : AppConstants.textColor.withOpacity(0.5),
-          size: 24,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: isActive
-                ? AppConstants.primaryColor
-                : AppConstants.textColor.withOpacity(0.5),
-            fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-            fontFamily: 'Public Sans',
-          ),
-        ),
-      ],
-    );
   }
 }
