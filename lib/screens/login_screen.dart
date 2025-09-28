@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vinculo/utils/constants.dart';
+import 'package:vinculo/widgets/custom_text_field.dart'; // Agrega este import
+import 'package:vinculo/widgets/custom_button.dart'; // Agrega este import
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -112,107 +114,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       Column(
                         children: [
                           // Campo de email
-                          Container(
-                            height: 64,
-                            decoration: BoxDecoration(
-                              color: AppConstants.backgroundColor,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: _emailFocusNode.hasFocus 
-                                    ? AppConstants.primaryColor 
-                                    : Colors.grey.shade300,
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: TextField(
-                              controller: _emailController,
-                              focusNode: _emailFocusNode,
-                              keyboardType: TextInputType.emailAddress,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                color: AppConstants.textColor,
-                                fontFamily: 'Public Sans',
-                              ),
-                              decoration: InputDecoration(
-                                hintText: 'Correo electrónico',
-                                hintStyle: TextStyle(
-                                  color: Colors.grey.shade500,
-                                  fontSize: 18,
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.mail_outline,
-                                  color: _emailFocusNode.hasFocus 
-                                      ? AppConstants.primaryColor 
-                                      : Colors.grey.shade500,
-                                  size: 24,
-                                ),
-                                border: InputBorder.none,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: AppConstants.defaultPadding,
-                                  vertical: 20,
-                                ),
-                              ),
-                            ),
+                          CustomTextField(
+                            controller: _emailController,
+                            hintText: 'Correo electrónico',
+                            keyboardType: TextInputType.emailAddress,
+                            prefixIcon: Icons.mail_outline,
                           ),
                           
                           const SizedBox(height: AppConstants.largePadding),
                           
                           // Campo de contraseña
-                          Container(
-                            height: 64,
-                            decoration: BoxDecoration(
-                              color: AppConstants.backgroundColor,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: _passwordFocusNode.hasFocus 
-                                    ? AppConstants.primaryColor 
-                                    : Colors.grey.shade300,
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: TextField(
-                              controller: _passwordController,
-                              focusNode: _passwordFocusNode,
-                              obscureText: true,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                color: AppConstants.textColor,
-                                fontFamily: 'Public Sans',
-                              ),
-                              decoration: InputDecoration(
-                                hintText: 'Contraseña',
-                                hintStyle: TextStyle(
-                                  color: Colors.grey.shade500,
-                                  fontSize: 18,
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.lock_outline,
-                                  color: _passwordFocusNode.hasFocus 
-                                      ? AppConstants.primaryColor 
-                                      : Colors.grey.shade500,
-                                  size: 24,
-                                ),
-                                border: InputBorder.none,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: AppConstants.defaultPadding,
-                                  vertical: 20,
-                                ),
-                              ),
-                            ),
+                          CustomTextField(
+                            controller: _passwordController,
+                            hintText: 'Contraseña',
+                            obscureText: true,
+                            prefixIcon: Icons.lock_outline,
                           ),
                           
                           const SizedBox(height: AppConstants.defaultPadding),
@@ -221,63 +137,23 @@ class _LoginScreenState extends State<LoginScreen> {
                           Column(
                             children: [
                               // Botón de iniciar sesión
-                              SizedBox(
-                                width: double.infinity,
-                                height: 64,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    // Lógica de login
-                                    _handleLogin();
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppConstants.primaryColor,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    elevation: 8,
-                                    shadowColor: AppConstants.primaryColor.withOpacity(0.3),
-                                  ),
-                                  child: const Text(
-                                    'Iniciar Sesión',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Public Sans',
-                                    ),
-                                  ),
-                                ),
+                              CustomButton(
+                                text: 'Iniciar Sesión',
+                                onPressed: _handleLogin,
+                                color: AppConstants.primaryColor,
+                                textColor: AppConstants.backgroundColor,
                               ),
                               
                               const SizedBox(height: AppConstants.defaultPadding),
                               
                               // Botón de registro
-                              SizedBox(
-                                width: double.infinity,
-                                height: 64,
-                                child: OutlinedButton(
-                                  onPressed: () {
-                                    Navigator.pushNamed(context, '/registro');
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: AppConstants.primaryColor,
-                                    side: const BorderSide(
-                                      color: AppConstants.primaryColor,
-                                      width: 2,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Registro',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Public Sans',
-                                    ),
-                                  ),
-                                ),
+                              CustomButton(
+                                text: 'Registro',
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/registro');
+                                },
+                                color: Colors.white,
+                                textColor: AppConstants.primaryColor,
                               ),
                             ],
                           ),
