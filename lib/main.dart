@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vinculo/screens/landig_screen.dart';
-import 'package:vinculo/screens/register_screen.dart';
+import 'package:vinculo/config/router/app_router.dart';
 import 'package:vinculo/utils/constants.dart';
 
 void main() {
@@ -12,18 +11,15 @@ class MiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
- return MaterialApp(
+    return MaterialApp(
       title: AppConstants.appName,
       theme: ThemeData(
         primaryColor: AppConstants.primaryColor,
         scaffoldBackgroundColor: AppConstants.backgroundColor,
         fontFamily: 'Inter',
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const LandingPage(),
-        '/registro': (context) => const RegisterScreen(), // Tu pantalla de registro anterior
-      },
+      initialRoute: AppRoutes.landing,
+      routes: AppRoutes.routes,
       debugShowCheckedModeBanner: false,
     );
   }
