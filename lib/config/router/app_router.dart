@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vinculo/screens/elderly/home_elderly_screen.dart';
 import 'package:vinculo/screens/landig_screen.dart';
 import 'package:vinculo/screens/login_screen.dart';
 import 'package:vinculo/screens/register_screen.dart';
@@ -12,6 +13,7 @@ class AppRoutes {
   static const String register = '/registro';
   static const String roles = '/roles';
   static const String registerElderly = '/register_elderly';
+  static const String homeElderly = '/home_elderly';
 
 
   static Map<String, WidgetBuilder> routes = {
@@ -20,6 +22,7 @@ class AppRoutes {
     register: (context) => const RegisterGeneralScreen(),
     roles: (context) => const RoleSelectionScreen(),
     registerElderly: (context) => const RegisterElderlyScreen(),
+    homeElderly: (context) => const HomeElderlyScreen(),
     // Agrega más rutas aquí
   };
 }

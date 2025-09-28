@@ -79,7 +79,7 @@ class _RegisterElderlyScreenState extends State<RegisterElderlyScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Scaffold(
-      backgroundColor: isDark ? AppConstants.backgroundColor : AppConstants.primaryColor,
+      backgroundColor: AppConstants.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -424,7 +424,7 @@ class _RegisterElderlyScreenState extends State<RegisterElderlyScreen> {
                     shadowColor: AppConstants.primaryColor.withOpacity(0.3),
                   ),
                   child: const Text(
-                    'Siguiente',
+                    'Terminar',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -486,52 +486,96 @@ class _RegisterElderlyScreenState extends State<RegisterElderlyScreen> {
         .map((interest) => interest.name)
         .toList();
 
+    _showSuccessScreen();
+  }
+
+  void _showSuccessScreen() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        title: const Text(
-          'Perfil Creado',
-          style: TextStyle(
-            fontFamily: 'Public Sans',
-            fontWeight: FontWeight.bold,
-            color: AppConstants.primaryColor,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        insetPadding: EdgeInsets.zero,
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: double.infinity,
+          height: MediaQuery.of(context).size.height,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppConstants.backgroundColor
+                : Colors.white,
+            borderRadius: BorderRadius.circular(0),
           ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Nombre: ${_nameController.text}'),
-            if (selectedInterestNames.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text('Intereses: ${selectedInterestNames.join(', ')}'),
-            ],
-            if (_bioController.text.trim().isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text('Descripción: ${_bioController.text}'),
-            ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // Navegar a la siguiente pantalla
-              Navigator.pushReplacementNamed(context, '/main');
-            },
-            child: const Text(
-              'Continuar',
-              style: TextStyle(
-                color: AppConstants.primaryColor,
-                fontFamily: 'Public Sans',
-                fontWeight: FontWeight.bold,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.check_circle,
+                        color: AppConstants.primaryColor,
+                        size: 100,
+                      ),
+                      const SizedBox(height: 32),
+                      Text(
+                        '¡Registro Exitoso!',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
+                          fontFamily: 'Public Sans',
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Tu cuenta ha sido creada. ¡Qué alegría tenerte aquí! Ya estás listo para conectar con personas maravillosas.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[300]
+                              : Colors.grey[700],
+                          fontFamily: 'Public Sans',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Cierra el modal
+                    Navigator.pushReplacementNamed(context, '/home_elderly'); // <-- Cambia aquí la ruta
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppConstants.primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    elevation: 8,
+                  ),
+                  child: const Text(
+                    'Empezar a Conectar',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Public Sans',
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
