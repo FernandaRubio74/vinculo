@@ -13,7 +13,10 @@ class RoleSelectionScreen extends StatelessWidget {
         child: Column(
           children: [
             // Header
-            CustomHeader(showHelp: true, onHelp: () => _showHelpDialog(context)),
+            CustomHeader(
+              showHelp: true,
+              onHelp: () => _showHelpDialog(context),
+            ),
             // Contenido principal
             Expanded(
               child: Padding(
@@ -44,9 +47,9 @@ class RoleSelectionScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 48),
-                    
+
                     // Opciones de rol
                     Container(
                       constraints: const BoxConstraints(maxWidth: 400),
@@ -59,9 +62,9 @@ class RoleSelectionScreen extends StatelessWidget {
                             icon: Icons.volunteer_activism,
                             onTap: () => _selectRole(context, 'volunteer'),
                           ),
-                          
+
                           const SizedBox(height: AppConstants.largePadding),
-                          
+
                           // Adulto Mayor
                           _buildRoleCard(
                             context: context,
@@ -76,16 +79,13 @@ class RoleSelectionScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
-         // Bottom Navigation
+
+            // Bottom Navigation
             Container(
               decoration: BoxDecoration(
                 color: AppConstants.backgroundColor,
                 border: Border(
-                  top: BorderSide(
-                    color: Colors.grey.shade200,
-                    width: 1,
-                  ),
+                  top: BorderSide(color: Colors.grey.shade200, width: 1),
                 ),
               ),
               child: SafeArea(
@@ -133,10 +133,7 @@ class RoleSelectionScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppConstants.backgroundColor,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.grey.shade200,
-            width: 1,
-          ),
+          border: Border.all(color: Colors.grey.shade200, width: 1),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
@@ -154,15 +151,11 @@ class RoleSelectionScreen extends StatelessWidget {
                 color: AppConstants.primaryColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                size: 48,
-                color: AppConstants.primaryColor,
-              ),
+              child: Icon(icon, size: 48, color: AppConstants.primaryColor),
             ),
-            
+
             const SizedBox(height: AppConstants.defaultPadding),
-            
+
             // Título
             Text(
               title,
@@ -189,8 +182,8 @@ class RoleSelectionScreen extends StatelessWidget {
       children: [
         Icon(
           icon,
-          color: isActive 
-              ? AppConstants.primaryColor 
+          color: isActive
+              ? AppConstants.primaryColor
               : AppConstants.textColor.withOpacity(0.5),
           size: 24,
         ),
@@ -199,8 +192,8 @@ class RoleSelectionScreen extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: isActive 
-                ? AppConstants.primaryColor 
+            color: isActive
+                ? AppConstants.primaryColor
                 : AppConstants.textColor.withOpacity(0.5),
             fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
             fontFamily: 'Public Sans',
@@ -213,15 +206,16 @@ class RoleSelectionScreen extends StatelessWidget {
   void _selectRole(BuildContext context, String role) {
     if (role == 'senior') {
       Navigator.pushNamed(context, '/register_elderly');
+    } else if (role == 'volunteer') {
+      Navigator.pushNamed(context, '/register_volunteer');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('¡Has seleccionado Voluntario Joven!'),
+          content: Text('Rol seleccionado: $role'),
           backgroundColor: AppConstants.primaryColor,
           duration: const Duration(seconds: 2),
         ),
       );
-      // Aquí puedes navegar a otra pantalla si lo deseas
     }
   }
 
@@ -244,10 +238,7 @@ class RoleSelectionScreen extends StatelessWidget {
           content: const Text(
             '• Voluntario Joven: Si eres una persona joven que quiere ayudar y conectar con adultos mayores.\n\n'
             '• Adulto Mayor: Si eres una persona de la tercera edad que busca compañía y apoyo.',
-            style: TextStyle(
-              fontFamily: 'Public Sans',
-              fontSize: 16,
-            ),
+            style: TextStyle(fontFamily: 'Public Sans', fontSize: 16),
           ),
           actions: [
             TextButton(
