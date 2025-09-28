@@ -211,17 +211,18 @@ class RoleSelectionScreen extends StatelessWidget {
   }
 
   void _selectRole(BuildContext context, String role) {
-    String message = role == 'volunteer' 
-        ? '¡Has seleccionado Voluntario Joven!' 
-        : '¡Has seleccionado Adulto Mayor!';
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppConstants.primaryColor,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    if (role == 'senior') {
+      Navigator.pushNamed(context, '/register_elderly');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('¡Has seleccionado Voluntario Joven!'),
+          backgroundColor: AppConstants.primaryColor,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      // Aquí puedes navegar a otra pantalla si lo deseas
+    }
   }
 
   void _showHelpDialog(BuildContext context) {
