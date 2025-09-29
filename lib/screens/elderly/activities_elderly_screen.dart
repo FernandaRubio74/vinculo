@@ -298,7 +298,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
 
   void _handleActivityTap(BuildContext context, ActivityOption activity) {
     if (activity.title == 'Videollamada') {
-      Navigator.pushReplacementNamed(context, '/video_call');
+      Navigator.pushReplacementNamed(context, '/active_volunteers');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

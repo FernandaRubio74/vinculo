@@ -38,7 +38,7 @@ class AppRoutes {
   static const String settingsElderly = '/settings_elderly';
   static const String videoCall = '/video_call';
   static const String settings = '/settings';
-  static const String volunteers = '/volunteers';
+  static const String volunteers = '/active_volunteers';
 
 
   static Map<String, WidgetBuilder> routes = {
