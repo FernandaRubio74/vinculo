@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vinculo/screens/elderly/active_volunteers_screen.dart';
 import 'package:vinculo/screens/elderly/activities_elderly_screen.dart';
 import 'package:vinculo/screens/elderly/home_elderly_screen.dart';
 import 'package:vinculo/screens/elderly/profile_elderly_screen.dart';
@@ -37,6 +38,7 @@ class AppRoutes {
   static const String settingsElderly = '/settings_elderly';
   static const String videoCall = '/video_call';
   static const String settings = '/settings';
+  static const String volunteers = '/volunteers';
 
 
   static Map<String, WidgetBuilder> routes = {
@@ -61,6 +63,7 @@ class AppRoutes {
     homeElderly: (context) => const HomeElderlyScreen(),
     activitiesElderly: (context) => const ActivitiesScreen(),
     profileElderly: (context) => const ProfileElderlyScreen(),
+    volunteers: (context) => const VolunteersScreen(),
     // Agrega más rutas aquí
   };
 }
