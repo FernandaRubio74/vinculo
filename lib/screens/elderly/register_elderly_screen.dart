@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vinculo/utils/constants.dart';
+import 'package:vinculo/widgets/custom_text_field.dart';
 
 class RegisterElderlyScreen extends StatefulWidget {
   const RegisterElderlyScreen({super.key});
@@ -170,44 +171,11 @@ class _RegisterElderlyScreenState extends State<RegisterElderlyScreen> {
                     // Campo de nombre
                     Container(
                       constraints: const BoxConstraints(maxWidth: 400),
-                      child: TextField(
+                      child: CustomTextField(
                         controller: _nameController,
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontFamily: 'Public Sans',
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Tu nombre',
-                          hintStyle: TextStyle(
-                            color: isDark ? AppConstants.textColor : AppConstants.backgroundColor,
-                            fontSize: 20,
-                          ),
-                          filled: true,
-                          fillColor: Theme.of(context).colorScheme.surface,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: isDark ? AppConstants.textColor : AppConstants.backgroundColor,
-                              width: 2,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: isDark ? AppConstants.textColor : AppConstants.backgroundColor,
-                              width: 2,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: AppConstants.primaryColor,
-                              width: 2,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.all(20),
-                        ),
+                        hintText: 'Tu nombre',
+                        prefixIcon: Icons.person,
+                        keyboardType: TextInputType.name,
                       ),
                     ),
                     
@@ -259,7 +227,7 @@ class _RegisterElderlyScreenState extends State<RegisterElderlyScreen> {
                                   boxShadow: isSelected
                                       ? [
                                           BoxShadow(
-                                            color: AppConstants.primaryColor.withOpacity(0.3),
+                                            color: AppConstants.hintColor,
                                             blurRadius: 8,
                                             spreadRadius: 0,
                                           ),
@@ -350,45 +318,11 @@ class _RegisterElderlyScreenState extends State<RegisterElderlyScreen> {
                         
                         Container(
                           constraints: const BoxConstraints(maxWidth: 400),
-                          child: TextField(
+                          child: CustomTextField(
                             controller: _bioController,
-                            maxLines: 4,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontFamily: 'Public Sans',
-                            ),
-                            decoration: InputDecoration(
-                              hintText: 'Escribe aquí...',
-                              hintStyle: TextStyle(
-                                color: isDark ? AppConstants.textColor : AppConstants.backgroundColor,
-                                fontSize: 16,
-                              ),
-                              filled: true,
-                              fillColor: Theme.of(context).colorScheme.surface,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: isDark ? AppConstants.textColor : AppConstants.backgroundColor,
-                                  width: 2,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: isDark ? AppConstants.textColor : AppConstants.backgroundColor,
-                                  width: 2,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: AppConstants.primaryColor,
-                                  width: 2,
-                                ),
-                              ),
-                              contentPadding: const EdgeInsets.all(16),
-                            ),
+                            hintText: 'Escribe aquí...',
+                            prefixIcon: Icons.edit,
+                            keyboardType: TextInputType.multiline,
                           ),
                         ),
                       ],

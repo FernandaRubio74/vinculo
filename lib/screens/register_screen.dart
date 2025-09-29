@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vinculo/utils/constants.dart';
 import 'package:vinculo/widgets/custom_header.dart';
+import 'package:vinculo/widgets/custom_text_field.dart';
 
 class RegisterGeneralScreen extends StatefulWidget {
   const RegisterGeneralScreen({super.key});
@@ -33,7 +34,7 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
         child: Column(
           children: [
             // Header con botón de retroceso
-           CustomHeader(showBack: true),
+            CustomHeader(showBack: true),
             // Contenido principal scrollable
             Expanded(
               child: SingleChildScrollView(
@@ -90,40 +91,40 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
                     Column(
                       children: [
                         // Campo Nombre
-                        _buildInputField(
+                        CustomTextField(
                           controller: _nameController,
                           hintText: 'Nombre completo',
                           keyboardType: TextInputType.name,
-                          icon: Icons.person_outline,
+                          prefixIcon: Icons.person_outline,
                         ),
 
                         const SizedBox(height: 20),
 
                         // Campo Email
-                        _buildInputField(
+                        CustomTextField(
                           controller: _emailController,
                           hintText: 'Correo electrónico',
                           keyboardType: TextInputType.emailAddress,
-                          icon: Icons.email_outlined,
+                          prefixIcon: Icons.email_outlined,
                         ),
 
                         const SizedBox(height: 20),
 
                         // Campo Contraseña
-                        _buildInputField(
+                        CustomTextField(
                           controller: _passwordController,
                           hintText: 'Crea una contraseña',
                           obscureText: true,
-                          icon: Icons.lock_outline,
+                          prefixIcon: Icons.lock_outline,
                         ),
 
                         const SizedBox(height: 20),
 
-                        _buildInputField(
+                        CustomTextField(
                           controller: _confirmPasswordController,
                           hintText: 'Confirma tu contraseña',
                           obscureText: true,
-                          icon: Icons.lock_outline,
+                          prefixIcon: Icons.lock_outline,
                         ),
                       ],
                     ),
@@ -225,49 +226,6 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInputField({
-    required TextEditingController controller,
-    required String hintText,
-    TextInputType? keyboardType,
-    bool obscureText = false,
-    required IconData icon,
-  }) {
-    return Container(
-      height: 64,
-      decoration: BoxDecoration(
-        color: AppConstants.backgroundColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        style: const TextStyle(
-          fontSize: 18,
-          color: AppConstants.textColor,
-          fontFamily: 'Public Sans',
-        ),
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 18),
-          prefixIcon: Icon(icon, color: AppConstants.primaryColor, size: 24),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: AppConstants.defaultPadding,
-            vertical: 20,
-          ),
         ),
       ),
     );
