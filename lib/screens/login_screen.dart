@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vinculo/config/providers/auth_provider.dart';
 import 'package:vinculo/utils/constants.dart';
-import 'package:vinculo/widgets/custom_text_field.dart'; // Agrega este import
-import 'package:vinculo/widgets/custom_button.dart'; // Agrega este import
+import 'package:vinculo/widgets/custom_text_field.dart';
+import 'package:vinculo/widgets/custom_button.dart';
+import 'package:vinculo/models/user_model.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _emailFocusNode = FocusNode();
@@ -27,6 +30,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+    final isLoading = authState == AuthState.loading;
+
     return Scaffold(
       backgroundColor: AppConstants.backgroundColor,
       body: Stack(
@@ -70,12 +76,12 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          
+
           // Contenido principal
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: AppConstants.largePadding,
                   vertical: AppConstants.defaultPadding,
                 ),
@@ -87,9 +93,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Encabezado
                       Column(
                         children: [
-                          Text(
+                          const Text(
                             AppConstants.appName,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 48,
                               fontWeight: FontWeight.w800,
                               color: AppConstants.primaryColor,
@@ -107,9 +113,52 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 48),
-                      
+
+                      // Información de usuarios de prueba
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppConstants.primaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Usuarios de prueba:',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.primaryColor,
+                                fontFamily: 'Public Sans',
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Adulto Mayor:\nelena@mail.com / 123456',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppConstants.textColor,
+                                fontFamily: 'Public Sans',
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Voluntario:\ncarlos@mail.com / 123456',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppConstants.textColor,
+                                fontFamily: 'Public Sans',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
                       // Formulario
                       Column(
                         children: [
@@ -120,9 +169,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             keyboardType: TextInputType.emailAddress,
                             prefixIcon: Icons.mail_outline,
                           ),
-                          
+
                           const SizedBox(height: AppConstants.largePadding),
-                          
+
                           // Campo de contraseña
                           CustomTextField(
                             controller: _passwordController,
@@ -130,22 +179,29 @@ class _LoginScreenState extends State<LoginScreen> {
                             obscureText: true,
                             prefixIcon: Icons.lock_outline,
                           ),
-                          
+
                           const SizedBox(height: AppConstants.defaultPadding),
-                          
+
                           // Botones
                           Column(
                             children: [
                               // Botón de iniciar sesión
-                              CustomButton(
-                                text: 'Iniciar Sesión',
-                                onPressed: _handleLogin,
-                                color: AppConstants.primaryColor,
-                                textColor: AppConstants.backgroundColor,
-                              ),
-                              
+                              if (isLoading)
+                                const Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppConstants.primaryColor,
+                                  ),
+                                )
+                              else
+                                CustomButton(
+                                  text: 'Iniciar Sesión',
+                                  onPressed: _handleLogin,
+                                  color: AppConstants.primaryColor,
+                                  textColor: AppConstants.backgroundColor,
+                                ),
+
                               const SizedBox(height: AppConstants.defaultPadding),
-                              
+
                               // Botón de registro
                               CustomButton(
                                 text: 'Registro',
@@ -157,15 +213,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ],
                           ),
-                          
+
                           const SizedBox(height: AppConstants.largePadding),
-                          
+
                           // Enlace de contraseña olvidada
                           TextButton(
-                            onPressed: () {
-                              // Lógica de recuperar contraseña
-                              _handleForgotPassword();
-                            },
+                            onPressed: _handleForgotPassword,
                             child: const Text(
                               '¿Olvidaste tu contraseña?',
                               style: TextStyle(
@@ -189,18 +242,38 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _handleLogin() {
-    // Implementar lógica de login
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Iniciando sesión...'),
-        backgroundColor: AppConstants.primaryColor,
-      ),
-    );
+  Future<void> _handleLogin() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      _showError('Por favor completa todos los campos');
+      return;
+    }
+
+    final authNotifier = ref.read(authProvider.notifier);
+    final result = await authNotifier.login(email, password);
+
+    if (result.isSuccess && result.user != null) {
+      // Guardar usuario actual
+      ref.read(currentUserProvider.notifier).state = result.user;
+
+      if (!mounted) return;
+
+      // Navegar según el tipo de usuario
+      if (result.user!.type == UserType.elderly) {
+        // Home para adulto mayor
+        Navigator.pushReplacementNamed(context, '/home_elderly');
+      } else {
+        // Home para voluntario
+        Navigator.pushReplacementNamed(context, '/volunteer_home');
+      }
+    } else {
+      _showError(result.errorMessage ?? 'Error al iniciar sesión');
+    }
   }
 
   void _handleForgotPassword() {
-    // Implementar lógica de recuperar contraseña
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Funcionalidad de recuperar contraseña'),
@@ -208,29 +281,12 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-}
 
-// Placeholder para la pantalla de registro
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Registro'),
-        backgroundColor: AppConstants.primaryColor,
-        foregroundColor: Colors.white,
-      ),
-      body: const Center(
-        child: Text(
-          'Pantalla de Registro\n(Próximamente)',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 24,
-            fontFamily: 'Public Sans',
-          ),
-        ),
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppConstants.accentColorLight,
       ),
     );
   }
