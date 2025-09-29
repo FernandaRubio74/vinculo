@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
 
-class VolunteerHomeScreen extends StatelessWidget {
+class VolunteerHomeScreen extends ConsumerWidget {
   const VolunteerHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = ref.watch(themeNotifierProvider).isDarkMode;
+
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: isDark
+          ? AppConstants.backgroundDark
+          : AppConstants.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'VínculoVital',
           style: TextStyle(
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
             fontFamily: 'Public Sans',
@@ -24,9 +30,12 @@ class VolunteerHomeScreen extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-              // Acción de configuración
+              Navigator.pushNamed(context, '/settings');
             },
-            icon: const Icon(Icons.settings, color: AppConstants.textColor),
+            icon: Icon(
+              Icons.settings,
+              color: isDark ? AppConstants.hintColor : AppConstants.textColor,
+            ),
           ),
         ],
       ),
@@ -36,67 +45,67 @@ class VolunteerHomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Saludo personalizado
-            const Text(
+            Text(
               '¡Hola, Carlos!',
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: AppConstants.textColor,
+                color: isDark ? AppConstants.hintColor : AppConstants.textColor,
                 fontFamily: 'Public Sans',
               ),
             ),
 
-            const SizedBox(height: 20), // Reducido de 24
+            const SizedBox(height: 20),
 
             // Sección de Conexiones Destacadas
-            _buildSectionTitle('Conexiones Destacadas'),
+            _buildSectionTitle('Conexiones Destacadas', isDark),
             const SizedBox(height: 12),
-            _buildFeaturedConnections(),
+            _buildFeaturedConnections(isDark),
 
             // Botón "Ver Conexiones"
             const SizedBox(height: 16),
-            _buildViewConnectionsButton(context),
+            _buildViewConnectionsButton(context, isDark),
 
-            const SizedBox(height: 20), // Reducido de 24
+            const SizedBox(height: 20),
 
             // Sección de Anuncios para Voluntarios
-            _buildSectionTitle('Anuncios para Voluntarios'),
+            _buildSectionTitle('Anuncios para Voluntarios', isDark),
             const SizedBox(height: 12),
-            _buildAnnouncementCard(),
+            _buildAnnouncementCard(isDark),
 
-            const SizedBox(height: 20), // Reducido de 24
+            const SizedBox(height: 20),
 
             // Sección de Progreso de Recompensas
-            _buildSectionTitle('Progreso de Recompensas'),
+            _buildSectionTitle('Progreso de Recompensas', isDark),
             const SizedBox(height: 12),
-            _buildRewardsProgress(),
+            _buildRewardsProgress(isDark),
 
-            const SizedBox(height: 20), // Reducido de 24
+            const SizedBox(height: 20),
 
             // Acciones rápidas mejoradas
-            _buildQuickActions(context),
+            _buildQuickActions(context, isDark),
 
-            const SizedBox(height: 20), // Reducido significativamente de 100
+            const SizedBox(height: 20),
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigation(context),
+      bottomNavigationBar: _buildBottomNavigation(context, isDark),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, bool isDark) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        color: AppConstants.textColor,
+        color: isDark ? AppConstants.hintColor : AppConstants.textColor,
         fontFamily: 'Public Sans',
       ),
     );
   }
 
-  Widget _buildFeaturedConnections() {
+  Widget _buildFeaturedConnections(bool isDark) {
     final connections = [
       {'name': 'Carlos', 'status': 'Próxima sesión:\nMañana'},
       {'name': 'Elena', 'status': 'Próxima sesión: 2 días'},
@@ -104,24 +113,26 @@ class VolunteerHomeScreen extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: 90, // Reducido de 100
+      height: 90,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: connections.length,
         itemBuilder: (context, index) {
           final connection = connections[index];
           return Container(
-            width: 85, // Reducido de 90
+            width: 85,
             margin: const EdgeInsets.only(right: 12),
             child: Column(
               children: [
                 // Avatar circular
                 Container(
-                  width: 50, // Reducido de 60
-                  height: 50, // Reducido de 60
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.grey.shade300,
+                    color: isDark
+                        ? Colors.grey.shade700
+                        : Colors.grey.shade300,
                     border: Border.all(
                       color: AppConstants.primaryColor,
                       width: 2,
@@ -129,18 +140,22 @@ class VolunteerHomeScreen extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.person,
-                    size: 25, // Reducido de 30
-                    color: Colors.grey.shade600,
+                    size: 25,
+                    color: isDark
+                        ? Colors.grey.shade400
+                        : Colors.grey.shade600,
                   ),
                 ),
-                const SizedBox(height: 6), // Reducido de 8
+                const SizedBox(height: 6),
                 // Nombre
                 Text(
                   connection['name']!,
-                  style: const TextStyle(
-                    fontSize: 13, // Reducido de 14
+                  style: TextStyle(
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppConstants.textColor,
+                    color: isDark
+                        ? AppConstants.hintColor
+                        : AppConstants.textColor,
                     fontFamily: 'Public Sans',
                   ),
                 ),
@@ -149,8 +164,10 @@ class VolunteerHomeScreen extends StatelessWidget {
                   child: Text(
                     connection['status']!,
                     style: TextStyle(
-                      fontSize: 9, // Reducido de 10
-                      color: AppConstants.textColor.withOpacity(0.7),
+                      fontSize: 9,
+                      color: isDark
+                          ? AppConstants.hintColor.withOpacity(0.7)
+                          : AppConstants.textColor.withOpacity(0.7),
                       fontFamily: 'Public Sans',
                     ),
                     textAlign: TextAlign.center,
@@ -166,8 +183,7 @@ class VolunteerHomeScreen extends StatelessWidget {
     );
   }
 
-  // Nuevo botón "Ver Conexiones"
-  Widget _buildViewConnectionsButton(BuildContext context) {
+  Widget _buildViewConnectionsButton(BuildContext context, bool isDark) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
@@ -177,11 +193,11 @@ class VolunteerHomeScreen extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppConstants.primaryColor,
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 14), // Reducido de 16
+          padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          elevation: 2,
+          elevation: isDark ? 6 : 2,
         ),
         icon: const Icon(Icons.people, size: 20),
         label: const Text(
@@ -196,13 +212,19 @@ class VolunteerHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAnnouncementCard() {
+  Widget _buildAnnouncementCard(bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(14), // Reducido de 16
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: isDark
+            ? Colors.blue.shade900.withOpacity(0.3)
+            : Colors.blue.shade50,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue.shade100),
+        border: Border.all(
+          color: isDark
+              ? Colors.blue.shade700.withOpacity(0.5)
+              : Colors.blue.shade100,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,39 +232,39 @@ class VolunteerHomeScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.blue.shade200,
+              color: isDark
+                  ? Colors.blue.shade700.withOpacity(0.5)
+                  : Colors.blue.shade200,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Text(
+            child: Text(
               'Nueva Capacitación Disponible',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Colors.blue,
+                color: isDark ? Colors.blue.shade200 : Colors.blue,
                 fontFamily: 'Public Sans',
               ),
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             '¡Inscríbete en el nuevo taller de "Comunicación Efectiva con Personas Mayores"! Mejora tus habilidades y gana más puntos.',
             style: TextStyle(
               fontSize: 14,
-              color: AppConstants.textColor,
+              color: isDark ? AppConstants.hintColor : AppConstants.textColor,
               fontFamily: 'Public Sans',
               height: 1.4,
             ),
           ),
           const SizedBox(height: 8),
           GestureDetector(
-            onTap: () {
-              // Acción de leer más
-            },
-            child: const Text(
+            onTap: () {},
+            child: Text(
               'Leer más',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.blue,
+                color: isDark ? Colors.blue.shade300 : Colors.blue,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Public Sans',
               ),
@@ -253,13 +275,19 @@ class VolunteerHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRewardsProgress() {
+  Widget _buildRewardsProgress(bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(14), // Reducido de 16
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: isDark
+            ? AppConstants.backgroundDark.withOpacity(0.5)
+            : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(
+          color: isDark
+              ? AppConstants.primaryColor.withOpacity(0.3)
+              : Colors.grey.shade200,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,13 +295,15 @@ class VolunteerHomeScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Flexible(
+              Flexible(
                 child: Text(
                   'Próxima Recompensa: Vale de Café',
                   style: TextStyle(
-                    fontSize: 15, // Reducido de 16
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: AppConstants.textColor,
+                    color: isDark
+                        ? AppConstants.hintColor
+                        : AppConstants.textColor,
                     fontFamily: 'Public Sans',
                   ),
                 ),
@@ -289,17 +319,19 @@ class VolunteerHomeScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10), // Reducido de 12
+          const SizedBox(height: 10),
           // Barra de progreso
           Container(
             height: 8,
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: isDark
+                  ? Colors.grey.shade800
+                  : Colors.grey.shade300,
               borderRadius: BorderRadius.circular(4),
             ),
             child: FractionallySizedBox(
               alignment: Alignment.centerLeft,
-              widthFactor: 0.75, // 75%
+              widthFactor: 0.75,
               child: Container(
                 decoration: BoxDecoration(
                   color: AppConstants.primaryColor,
@@ -308,21 +340,25 @@ class VolunteerHomeScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 6), // Reducido de 8
+          const SizedBox(height: 6),
           Text(
             'Puntos',
             style: TextStyle(
               fontSize: 12,
-              color: AppConstants.textColor.withOpacity(0.7),
+              color: isDark
+                  ? AppConstants.hintColor.withOpacity(0.7)
+                  : AppConstants.textColor.withOpacity(0.7),
               fontFamily: 'Public Sans',
             ),
           ),
-          const SizedBox(height: 4), // Reducido de 8
+          const SizedBox(height: 4),
           Text(
             '¡Sigue así! Estás a solo 25 puntos de tu recompensa.',
             style: TextStyle(
               fontSize: 12,
-              color: AppConstants.textColor.withOpacity(0.7),
+              color: isDark
+                  ? AppConstants.hintColor.withOpacity(0.7)
+                  : AppConstants.textColor.withOpacity(0.7),
               fontFamily: 'Public Sans',
             ),
           ),
@@ -331,17 +367,20 @@ class VolunteerHomeScreen extends StatelessWidget {
     );
   }
 
-  // Acciones rápidas mejoradas según la imagen
-  Widget _buildQuickActions(BuildContext context) {
+  Widget _buildQuickActions(BuildContext context, bool isDark) {
     return Row(
       children: [
         Expanded(
           child: _buildActionButton(
             icon: Icons.assignment,
             title: 'Registrar\nSesión',
-            color: Colors.blue.shade50,
+            color: isDark
+                ? Colors.blue.shade900.withOpacity(0.3)
+                : Colors.blue.shade50,
             iconColor: AppConstants.primaryColor,
-            borderColor: Colors.blue.shade200,
+            borderColor: isDark
+                ? Colors.blue.shade700.withOpacity(0.5)
+                : Colors.blue.shade200,
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -389,8 +428,8 @@ class VolunteerHomeScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 80, // Volver a altura original
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Padding más específico
+        height: 80,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(12),
@@ -398,21 +437,21 @@ class VolunteerHomeScreen extends StatelessWidget {
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min, // Importante para evitar overflow
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 20, color: iconColor), // Tamaño más pequeño
+            Icon(icon, size: 20, color: iconColor),
             const SizedBox(height: 6),
-            Flexible( // Permite que el texto se ajuste
+            Flexible(
               child: Text(
                 title,
                 style: TextStyle(
-                  fontSize: 10, // Más pequeño
+                  fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: iconColor,
                   fontFamily: 'Public Sans',
                 ),
                 textAlign: TextAlign.center,
-                maxLines: 2, // Máximo 2 líneas
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -422,24 +461,38 @@ class VolunteerHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNavigation(BuildContext context) {
+  Widget _buildBottomNavigation(BuildContext context, bool isDark) {
     return Container(
       height: 80,
       decoration: BoxDecoration(
-        color: AppConstants.backgroundColor,
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        color: isDark
+            ? AppConstants.backgroundDark
+            : AppConstants.backgroundColor,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+          ),
+        ),
+        boxShadow: isDark
+            ? [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ]
+            : [],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           GestureDetector(
-            onTap: () {
-              // Ya estamos en inicio, no hacer nada
-            },
+            onTap: () {},
             child: _buildNavItem(
               icon: Icons.home,
               label: 'Inicio',
               isActive: true,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
@@ -450,6 +503,7 @@ class VolunteerHomeScreen extends StatelessWidget {
               icon: Icons.people,
               label: 'Matches',
               isActive: false,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
@@ -460,6 +514,7 @@ class VolunteerHomeScreen extends StatelessWidget {
               icon: Icons.card_giftcard,
               label: 'Recompensas',
               isActive: false,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
@@ -470,6 +525,7 @@ class VolunteerHomeScreen extends StatelessWidget {
               icon: Icons.person,
               label: 'Perfil',
               isActive: false,
+              isDark: isDark,
             ),
           ),
         ],
@@ -481,6 +537,7 @@ class VolunteerHomeScreen extends StatelessWidget {
     required IconData icon,
     required String label,
     required bool isActive,
+    required bool isDark,
   }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -489,7 +546,9 @@ class VolunteerHomeScreen extends StatelessWidget {
           icon,
           color: isActive
               ? AppConstants.primaryColor
-              : AppConstants.textColor.withOpacity(0.5),
+              : (isDark
+                  ? AppConstants.hintColor.withOpacity(0.5)
+                  : AppConstants.textColor.withOpacity(0.5)),
           size: 24,
         ),
         const SizedBox(height: 4),
@@ -499,7 +558,9 @@ class VolunteerHomeScreen extends StatelessWidget {
             fontSize: 12,
             color: isActive
                 ? AppConstants.primaryColor
-                : AppConstants.textColor.withOpacity(0.5),
+                : (isDark
+                    ? AppConstants.hintColor.withOpacity(0.5)
+                    : AppConstants.textColor.withOpacity(0.5)),
             fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
             fontFamily: 'Public Sans',
           ),

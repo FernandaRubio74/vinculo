@@ -1,24 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
 
-class RewardsScreen extends StatelessWidget {
+class RewardsScreen extends ConsumerWidget {
   const RewardsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = ref.watch(themeNotifierProvider).isDarkMode;
+
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: isDark
+          ? AppConstants.backgroundDark
+          : AppConstants.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back, color: AppConstants.textColor),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
+          ),
         ),
-        title: const Text(
+        title: Text(
           'Recompensas',
           style: TextStyle(
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
             fontFamily: 'Public Sans',
@@ -32,45 +41,45 @@ class RewardsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Sección de Beneficios
-            _buildSectionTitle('Beneficios'),
+            _buildSectionTitle('Beneficios', isDark),
             const SizedBox(height: 16),
-            _buildBenefitsSection(),
+            _buildBenefitsSection(isDark),
 
             const SizedBox(height: 32),
 
             // Sección de Certificados Disponibles
-            _buildSectionTitle('Certificados Disponibles'),
+            _buildSectionTitle('Certificados Disponibles', isDark),
             const SizedBox(height: 16),
-            _buildCertificatesSection(context), // CORREGIDO: Pasar context
+            _buildCertificatesSection(context, isDark),
 
             const SizedBox(height: 32),
 
             // Sección de Mi Progreso
-            _buildSectionTitle('Mi Progreso'),
+            _buildSectionTitle('Mi Progreso', isDark),
             const SizedBox(height: 16),
-            _buildProgressSection(),
+            _buildProgressSection(isDark),
 
             const SizedBox(height: 100), // Espacio para navegación inferior
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigation(context),
+      bottomNavigationBar: _buildBottomNavigation(context, isDark),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, bool isDark) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.bold,
-        color: AppConstants.textColor,
+        color: isDark ? AppConstants.hintColor : AppConstants.textColor,
         fontFamily: 'Public Sans',
       ),
     );
   }
 
-  Widget _buildBenefitsSection() {
+  Widget _buildBenefitsSection(bool isDark) {
     final benefits = [
       {
         'title': 'Certificados Académicos',
@@ -95,20 +104,30 @@ class RewardsScreen extends StatelessWidget {
     ];
 
     return Column(
-      children: benefits.map((benefit) => _buildBenefitCard(benefit)).toList(),
+      children: benefits.map((benefit) => _buildBenefitCard(benefit, isDark)).toList(),
     );
   }
 
-  Widget _buildBenefitCard(Map<String, dynamic> benefit) {
+  Widget _buildBenefitCard(Map<String, dynamic> benefit, bool isDark) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? AppConstants.backgroundDark.withOpacity(0.5)
+            : Colors.white,
         borderRadius: BorderRadius.circular(12),
+        border: isDark
+            ? Border.all(
+                color: AppConstants.primaryColor.withOpacity(0.2),
+                width: 1,
+              )
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: isDark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -121,7 +140,7 @@ class RewardsScreen extends StatelessWidget {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: (benefit['color'] as Color).withOpacity(0.1),
+              color: (benefit['color'] as Color).withOpacity(isDark ? 0.3 : 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(benefit['icon'], color: benefit['color'], size: 24),
@@ -136,10 +155,12 @@ class RewardsScreen extends StatelessWidget {
               children: [
                 Text(
                   benefit['title'],
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppConstants.textColor,
+                    color: isDark
+                        ? AppConstants.hintColor
+                        : AppConstants.textColor,
                     fontFamily: 'Public Sans',
                   ),
                 ),
@@ -148,7 +169,9 @@ class RewardsScreen extends StatelessWidget {
                   benefit['description'],
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppConstants.textColor.withOpacity(0.7),
+                    color: isDark
+                        ? AppConstants.hintColor.withOpacity(0.7)
+                        : AppConstants.textColor.withOpacity(0.7),
                     fontFamily: 'Public Sans',
                   ),
                 ),
@@ -160,8 +183,7 @@ class RewardsScreen extends StatelessWidget {
     );
   }
 
-  // CORREGIDO: Método que recibe context como parámetro
-  Widget _buildCertificatesSection(BuildContext context) {
+  Widget _buildCertificatesSection(BuildContext context, bool isDark) {
     final certificates = [
       {
         'title': 'Certificado de Voluntariado Social',
@@ -182,15 +204,15 @@ class RewardsScreen extends StatelessWidget {
 
     return Column(
       children: certificates
-          .map((cert) => _buildCertificateCard(context, cert))
+          .map((cert) => _buildCertificateCard(context, cert, isDark))
           .toList(),
     );
   }
 
-  // CORREGIDO: Método que recibe context como parámetro
   Widget _buildCertificateCard(
     BuildContext context,
     Map<String, dynamic> certificate,
+    bool isDark,
   ) {
     final bool isAvailable = certificate['available'] as bool;
     final int currentHours = certificate['currentHours'] as int;
@@ -200,11 +222,21 @@ class RewardsScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? AppConstants.backgroundDark.withOpacity(0.5)
+            : Colors.white,
         borderRadius: BorderRadius.circular(12),
+        border: isDark
+            ? Border.all(
+                color: AppConstants.primaryColor.withOpacity(0.2),
+                width: 1,
+              )
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: isDark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -218,8 +250,12 @@ class RewardsScreen extends StatelessWidget {
             height: 50,
             decoration: BoxDecoration(
               color: isAvailable
-                  ? Colors.green.withOpacity(0.1)
-                  : Colors.grey.withOpacity(0.1),
+                  ? (isDark
+                      ? Colors.green.withOpacity(0.3)
+                      : Colors.green.withOpacity(0.1))
+                  : (isDark
+                      ? Colors.grey.withOpacity(0.3)
+                      : Colors.grey.withOpacity(0.1)),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -238,10 +274,12 @@ class RewardsScreen extends StatelessWidget {
               children: [
                 Text(
                   certificate['title'],
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppConstants.textColor,
+                    color: isDark
+                        ? AppConstants.hintColor
+                        : AppConstants.textColor,
                     fontFamily: 'Public Sans',
                   ),
                 ),
@@ -250,7 +288,9 @@ class RewardsScreen extends StatelessWidget {
                   certificate['description'],
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppConstants.textColor.withOpacity(0.7),
+                    color: isDark
+                        ? AppConstants.hintColor.withOpacity(0.7)
+                        : AppConstants.textColor.withOpacity(0.7),
                     fontFamily: 'Public Sans',
                   ),
                 ),
@@ -262,7 +302,9 @@ class RewardsScreen extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
+                      color: isDark
+                          ? Colors.green.withOpacity(0.3)
+                          : Colors.green.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
@@ -280,7 +322,9 @@ class RewardsScreen extends StatelessWidget {
                     '$currentHours/$requiredHours horas',
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppConstants.textColor.withOpacity(0.5),
+                      color: isDark
+                          ? AppConstants.hintColor.withOpacity(0.5)
+                          : AppConstants.textColor.withOpacity(0.5),
                       fontFamily: 'Public Sans',
                     ),
                   ),
@@ -292,7 +336,7 @@ class RewardsScreen extends StatelessWidget {
           if (isAvailable)
             ElevatedButton(
               onPressed: () =>
-                  _downloadCertificate(context, certificate['title']),
+                  _downloadCertificate(context, certificate['title'], isDark),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppConstants.primaryColor,
                 foregroundColor: Colors.white,
@@ -303,6 +347,7 @@ class RewardsScreen extends StatelessWidget {
                   horizontal: 16,
                   vertical: 8,
                 ),
+                elevation: isDark ? 6 : 2,
               ),
               child: const Text(
                 'Descargar',
@@ -318,15 +363,25 @@ class RewardsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProgressSection() {
+  Widget _buildProgressSection(bool isDark) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? AppConstants.backgroundDark.withOpacity(0.5)
+            : Colors.white,
         borderRadius: BorderRadius.circular(12),
+        border: isDark
+            ? Border.all(
+                color: AppConstants.primaryColor.withOpacity(0.2),
+                width: 1,
+              )
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: isDark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -342,6 +397,7 @@ class RewardsScreen extends StatelessWidget {
                   title: 'Horas de Voluntariado',
                   value: '75',
                   color: Colors.blue,
+                  isDark: isDark,
                 ),
               ),
               const SizedBox(width: 16),
@@ -350,6 +406,7 @@ class RewardsScreen extends StatelessWidget {
                   title: 'Certificados Obtenidos',
                   value: '1',
                   color: Colors.green,
+                  isDark: isDark,
                 ),
               ),
             ],
@@ -364,16 +421,18 @@ class RewardsScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Progreso para el próximo certificado',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: AppConstants.textColor,
+                      color: isDark
+                          ? AppConstants.hintColor
+                          : AppConstants.textColor,
                       fontFamily: 'Public Sans',
                     ),
                   ),
-                  Text(
+                  const Text(
                     '75/100',
                     style: TextStyle(
                       fontSize: 14,
@@ -391,7 +450,7 @@ class RewardsScreen extends StatelessWidget {
               Container(
                 height: 8,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: FractionallySizedBox(
@@ -412,7 +471,9 @@ class RewardsScreen extends StatelessWidget {
                 '25 horas restantes',
                 style: TextStyle(
                   fontSize: 12,
-                  color: AppConstants.textColor.withOpacity(0.7),
+                  color: isDark
+                      ? AppConstants.hintColor.withOpacity(0.7)
+                      : AppConstants.textColor.withOpacity(0.7),
                   fontFamily: 'Public Sans',
                 ),
               ),
@@ -427,12 +488,19 @@ class RewardsScreen extends StatelessWidget {
     required String title,
     required String value,
     required Color color,
+    required bool isDark,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withOpacity(isDark ? 0.2 : 0.1),
         borderRadius: BorderRadius.circular(12),
+        border: isDark
+            ? Border.all(
+                color: color.withOpacity(0.4),
+                width: 1,
+              )
+            : null,
       ),
       child: Column(
         children: [
@@ -461,12 +529,13 @@ class RewardsScreen extends StatelessWidget {
     );
   }
 
-  // CORREGIDO: Método que recibe context como parámetro
-  void _downloadCertificate(BuildContext context, String certificateTitle) {
-    // Simular descarga de certificado
+  void _downloadCertificate(BuildContext context, String certificateTitle, bool isDark) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: isDark
+            ? AppConstants.backgroundDark
+            : AppConstants.backgroundColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text(
           'Certificado Descargado',
@@ -478,7 +547,10 @@ class RewardsScreen extends StatelessWidget {
         ),
         content: Text(
           'Tu $certificateTitle ha sido descargado exitosamente.',
-          style: const TextStyle(fontFamily: 'Public Sans'),
+          style: TextStyle(
+            fontFamily: 'Public Sans',
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
+          ),
         ),
         actions: [
           ElevatedButton(
@@ -496,12 +568,27 @@ class RewardsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNavigation(BuildContext context) {
+  Widget _buildBottomNavigation(BuildContext context, bool isDark) {
     return Container(
       height: 80,
       decoration: BoxDecoration(
-        color: AppConstants.backgroundColor,
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        color: isDark
+            ? AppConstants.backgroundDark
+            : AppConstants.backgroundColor,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+          ),
+        ),
+        boxShadow: isDark
+            ? [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ]
+            : [],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -514,6 +601,7 @@ class RewardsScreen extends StatelessWidget {
               icon: Icons.home,
               label: 'Inicio',
               isActive: false,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
@@ -524,16 +612,16 @@ class RewardsScreen extends StatelessWidget {
               icon: Icons.people,
               label: 'Matches',
               isActive: false,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
-            onTap: () {
-              // Ya estamos en recompensas, no hacer nada
-            },
+            onTap: () {},
             child: _buildNavItem(
               icon: Icons.card_giftcard,
               label: 'Recompensas',
               isActive: true,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
@@ -544,6 +632,7 @@ class RewardsScreen extends StatelessWidget {
               icon: Icons.person,
               label: 'Perfil',
               isActive: false,
+              isDark: isDark,
             ),
           ),
         ],
@@ -555,6 +644,7 @@ class RewardsScreen extends StatelessWidget {
     required IconData icon,
     required String label,
     required bool isActive,
+    required bool isDark,
   }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -563,7 +653,9 @@ class RewardsScreen extends StatelessWidget {
           icon,
           color: isActive
               ? AppConstants.primaryColor
-              : AppConstants.textColor.withOpacity(0.5),
+              : (isDark
+                  ? AppConstants.hintColor.withOpacity(0.5)
+                  : AppConstants.textColor.withOpacity(0.5)),
           size: 24,
         ),
         const SizedBox(height: 4),
@@ -573,7 +665,9 @@ class RewardsScreen extends StatelessWidget {
             fontSize: 12,
             color: isActive
                 ? AppConstants.primaryColor
-                : AppConstants.textColor.withOpacity(0.5),
+                : (isDark
+                    ? AppConstants.hintColor.withOpacity(0.5)
+                    : AppConstants.textColor.withOpacity(0.5)),
             fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
             fontFamily: 'Public Sans',
           ),

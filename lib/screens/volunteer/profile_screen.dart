@@ -1,24 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = ref.watch(themeNotifierProvider).isDarkMode;
+
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: isDark
+          ? AppConstants.backgroundDark
+          : AppConstants.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back, color: AppConstants.textColor),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
+          ),
         ),
-        title: const Text(
+        title: Text(
           'Perfil',
           style: TextStyle(
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
             fontFamily: 'Public Sans',
@@ -28,7 +37,17 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () => Navigator.pushNamed(context, '/history'),
-            icon: const Icon(Icons.history, color: AppConstants.textColor),
+            icon: Icon(
+              Icons.history,
+              color: isDark ? AppConstants.hintColor : AppConstants.textColor,
+            ),
+          ),
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, '/settings'),
+            icon: Icon(
+              Icons.settings,
+              color: isDark ? AppConstants.hintColor : AppConstants.textColor,
+            ),
           ),
         ],
       ),
@@ -37,42 +56,42 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           children: [
             // Sección de perfil del usuario
-            _buildProfileHeader(context),
+            _buildProfileHeader(context, isDark),
 
             const SizedBox(height: 32),
 
             // Estadísticas
-            _buildStatsSection(),
+            _buildStatsSection(isDark),
 
             const SizedBox(height: 32),
 
             // Calendario de Actividades
-            _buildCalendarSection(),
+            _buildCalendarSection(isDark),
 
             const SizedBox(height: 24),
 
             // Próximas actividades
-            _buildUpcomingActivities(),
+            _buildUpcomingActivities(isDark),
 
             const SizedBox(height: 32),
 
             // Habilidades
-            _buildSkillsSection(),
+            _buildSkillsSection(isDark),
 
             const SizedBox(height: 32),
 
             // Disponibilidad
-            _buildAvailabilitySection(),
+            _buildAvailabilitySection(isDark),
 
             const SizedBox(height: 100), // Espacio para navegación inferior
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigation(context),
+      bottomNavigationBar: _buildBottomNavigation(context, isDark),
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context) {
+  Widget _buildProfileHeader(BuildContext context, bool isDark) {
     return Column(
       children: [
         // Avatar con verificación
@@ -83,13 +102,18 @@ class ProfileScreen extends StatelessWidget {
               height: 100,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.orange.shade200,
-                border: Border.all(color: AppConstants.primaryColor, width: 3),
+                color: isDark
+                    ? Colors.orange.shade800.withOpacity(0.3)
+                    : Colors.orange.shade200,
+                border: Border.all(
+                  color: AppConstants.primaryColor,
+                  width: 3,
+                ),
               ),
               child: Icon(
                 Icons.person,
                 size: 50,
-                color: Colors.orange.shade800,
+                color: isDark ? Colors.orange.shade300 : Colors.orange.shade800,
               ),
             ),
             Positioned(
@@ -110,12 +134,12 @@ class ProfileScreen extends StatelessWidget {
         const SizedBox(height: 16),
 
         // Nombre y tipo de usuario
-        const Text(
+        Text(
           'Carlos Mendoza',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontFamily: 'Public Sans',
           ),
         ),
@@ -126,7 +150,9 @@ class ProfileScreen extends StatelessWidget {
           'Voluntario',
           style: TextStyle(
             fontSize: 16,
-            color: AppConstants.textColor.withOpacity(0.7),
+            color: isDark
+                ? AppConstants.hintColor.withOpacity(0.7)
+                : AppConstants.textColor.withOpacity(0.7),
             fontFamily: 'Public Sans',
           ),
         ),
@@ -143,8 +169,12 @@ class ProfileScreen extends StatelessWidget {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           ),
-          icon: Icon(Icons.history, size: 16, color: AppConstants.primaryColor),
-          label: Text(
+          icon: const Icon(
+            Icons.history,
+            size: 16,
+            color: AppConstants.primaryColor,
+          ),
+          label: const Text(
             'Ver Historial',
             style: TextStyle(
               color: AppConstants.primaryColor,
@@ -158,7 +188,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsSection() {
+  Widget _buildStatsSection(bool isDark) {
     return Row(
       children: [
         Expanded(
@@ -166,6 +196,7 @@ class ProfileScreen extends StatelessWidget {
             value: '150',
             label: 'Horas de\nvoluntariado',
             color: AppConstants.primaryColor,
+            isDark: isDark,
           ),
         ),
         const SizedBox(width: 24),
@@ -174,6 +205,7 @@ class ProfileScreen extends StatelessWidget {
             value: '25',
             label: 'Recompensas',
             color: AppConstants.primaryColor,
+            isDark: isDark,
           ),
         ),
       ],
@@ -184,42 +216,60 @@ class ProfileScreen extends StatelessWidget {
     required String value,
     required String label,
     required Color color,
+    required bool isDark,
   }) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 36,
-            fontWeight: FontWeight.bold,
-            color: color,
-            fontFamily: 'Public Sans',
-          ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark
+            ? color.withOpacity(0.2)
+            : color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark
+              ? color.withOpacity(0.4)
+              : color.withOpacity(0.2),
+          width: 1,
         ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: AppConstants.textColor.withOpacity(0.7),
-            fontFamily: 'Public Sans',
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+              color: color,
+              fontFamily: 'Public Sans',
+            ),
           ),
-          textAlign: TextAlign.center,
-        ),
-      ],
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              color: isDark
+                  ? AppConstants.hintColor.withOpacity(0.8)
+                  : AppConstants.textColor.withOpacity(0.7),
+              fontFamily: 'Public Sans',
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildCalendarSection() {
+  Widget _buildCalendarSection(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Calendario de Actividades',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontFamily: 'Public Sans',
           ),
         ),
@@ -227,21 +277,51 @@ class ProfileScreen extends StatelessWidget {
         const SizedBox(height: 16),
 
         // Header del calendario
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.chevron_left)),
-            const Text(
-              'Junio 2024',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Public Sans',
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: isDark
+                ? AppConstants.backgroundDark.withOpacity(0.5)
+                : Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.chevron_left,
+                  color: isDark
+                      ? AppConstants.hintColor
+                      : AppConstants.textColor,
+                ),
               ),
-            ),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.chevron_right)),
-          ],
+              Text(
+                'Junio 2024',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Public Sans',
+                  color: isDark
+                      ? AppConstants.hintColor
+                      : AppConstants.textColor,
+                ),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.chevron_right,
+                  color: isDark
+                      ? AppConstants.hintColor
+                      : AppConstants.textColor,
+                ),
+              ),
+            ],
+          ),
         ),
+
+        const SizedBox(height: 8),
 
         // Días de la semana
         Row(
@@ -256,7 +336,9 @@ class ProfileScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: AppConstants.textColor.withOpacity(0.7),
+                  color: isDark
+                      ? AppConstants.hintColor.withOpacity(0.7)
+                      : AppConstants.textColor.withOpacity(0.7),
                   fontFamily: 'Public Sans',
                 ),
               ),
@@ -267,16 +349,16 @@ class ProfileScreen extends StatelessWidget {
         const SizedBox(height: 8),
 
         // Calendario simplificado
-        _buildCalendarGrid(),
+        _buildCalendarGrid(isDark),
       ],
     );
   }
 
-  Widget _buildCalendarGrid() {
+  Widget _buildCalendarGrid(bool isDark) {
     final daysInMonth = 30;
     final startDay = 6; // Junio 2024 empieza en sábado (índice 6)
 
-    return Container(
+    return SizedBox(
       height: 200,
       child: GridView.builder(
         physics: const NeverScrollableScrollPhysics(),
@@ -292,7 +374,8 @@ class ProfileScreen extends StatelessWidget {
             return const SizedBox();
           }
 
-          final hasActivity = dayNumber == 5 || dayNumber == 18; // Días con actividades
+          final hasActivity =
+              dayNumber == 5 || dayNumber == 18; // Días con actividades
           final isToday = dayNumber == 5;
 
           return Container(
@@ -313,8 +396,10 @@ class ProfileScreen extends StatelessWidget {
                   color: isToday
                       ? Colors.white
                       : hasActivity
-                      ? AppConstants.primaryColor
-                      : AppConstants.textColor,
+                          ? AppConstants.primaryColor
+                          : isDark
+                              ? AppConstants.hintColor
+                              : AppConstants.textColor,
                   fontFamily: 'Public Sans',
                 ),
               ),
@@ -325,7 +410,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildUpcomingActivities() {
+  Widget _buildUpcomingActivities(bool isDark) {
     final activities = [
       {
         'day': 'MIÉ',
@@ -344,22 +429,31 @@ class ProfileScreen extends StatelessWidget {
     ];
 
     return Column(
-      children: activities
-          .map((activity) => _buildActivityCard(activity))
-          .toList(),
+      children:
+          activities.map((activity) => _buildActivityCard(activity, isDark)).toList(),
     );
   }
 
-  Widget _buildActivityCard(Map<String, String> activity) {
+  Widget _buildActivityCard(Map<String, String> activity, bool isDark) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? AppConstants.backgroundDark.withOpacity(0.5)
+            : Colors.white,
         borderRadius: BorderRadius.circular(12),
+        border: isDark
+            ? Border.all(
+                color: AppConstants.primaryColor.withOpacity(0.2),
+                width: 1,
+              )
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: isDark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -368,13 +462,13 @@ class ProfileScreen extends StatelessWidget {
       child: Row(
         children: [
           // Fecha
-          Container(
+          SizedBox(
             width: 50,
             child: Column(
               children: [
                 Text(
                   activity['day']!,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppConstants.primaryColor,
@@ -383,7 +477,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 Text(
                   activity['date']!,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: AppConstants.primaryColor,
@@ -403,10 +497,12 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 Text(
                   activity['title']!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppConstants.textColor,
+                    color: isDark
+                        ? AppConstants.hintColor
+                        : AppConstants.textColor,
                     fontFamily: 'Public Sans',
                   ),
                 ),
@@ -415,7 +511,9 @@ class ProfileScreen extends StatelessWidget {
                   activity['time']!,
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppConstants.textColor.withOpacity(0.7),
+                    color: isDark
+                        ? AppConstants.hintColor.withOpacity(0.7)
+                        : AppConstants.textColor.withOpacity(0.7),
                     fontFamily: 'Public Sans',
                   ),
                 ),
@@ -424,7 +522,9 @@ class ProfileScreen extends StatelessWidget {
                   activity['subtitle']!,
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppConstants.textColor.withOpacity(0.7),
+                    color: isDark
+                        ? AppConstants.hintColor.withOpacity(0.7)
+                        : AppConstants.textColor.withOpacity(0.7),
                     fontFamily: 'Public Sans',
                   ),
                 ),
@@ -436,18 +536,18 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSkillsSection() {
+  Widget _buildSkillsSection(bool isDark) {
     final skills = ['Primeros auxilios', 'Acompañamiento', 'Tecnología'];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Habilidades',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontFamily: 'Public Sans',
           ),
         ),
@@ -461,17 +561,23 @@ class ProfileScreen extends StatelessWidget {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: AppConstants.primaryColor.withOpacity(0.1),
+                color: isDark
+                    ? AppConstants.primaryColor.withOpacity(0.3)
+                    : AppConstants.primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: AppConstants.primaryColor.withOpacity(0.3),
+                  color: isDark
+                      ? AppConstants.primaryColor.withOpacity(0.5)
+                      : AppConstants.primaryColor.withOpacity(0.3),
                 ),
               ),
               child: Text(
                 skill,
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppConstants.primaryColor,
+                  color: isDark
+                      ? AppConstants.hintColor
+                      : AppConstants.primaryColor,
                   fontWeight: FontWeight.w500,
                   fontFamily: 'Public Sans',
                 ),
@@ -483,16 +589,16 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAvailabilitySection() {
+  Widget _buildAvailabilitySection(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Disponibilidad',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontFamily: 'Public Sans',
           ),
         ),
@@ -502,19 +608,27 @@ class ProfileScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: isDark
+                ? AppConstants.backgroundDark.withOpacity(0.5)
+                : Colors.grey.shade50,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(
+              color: isDark
+                  ? AppConstants.primaryColor.withOpacity(0.2)
+                  : Colors.grey.shade200,
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Semanal',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppConstants.textColor,
+                  color: isDark
+                      ? AppConstants.hintColor
+                      : AppConstants.textColor,
                   fontFamily: 'Public Sans',
                 ),
               ),
@@ -523,7 +637,9 @@ class ProfileScreen extends StatelessWidget {
                 'Lunes a viernes, 18:00-20:00',
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppConstants.textColor.withOpacity(0.7),
+                  color: isDark
+                      ? AppConstants.hintColor.withOpacity(0.7)
+                      : AppConstants.textColor.withOpacity(0.7),
                   fontFamily: 'Public Sans',
                 ),
               ),
@@ -534,12 +650,27 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNavigation(BuildContext context) {
+  Widget _buildBottomNavigation(BuildContext context, bool isDark) {
     return Container(
       height: 80,
       decoration: BoxDecoration(
-        color: AppConstants.backgroundColor,
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        color: isDark
+            ? AppConstants.backgroundDark
+            : AppConstants.backgroundColor,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+          ),
+        ),
+        boxShadow: isDark
+            ? [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ]
+            : [],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -552,6 +683,7 @@ class ProfileScreen extends StatelessWidget {
               icon: Icons.home,
               label: 'Inicio',
               isActive: false,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
@@ -562,6 +694,7 @@ class ProfileScreen extends StatelessWidget {
               icon: Icons.people,
               label: 'Matches',
               isActive: false,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
@@ -572,6 +705,7 @@ class ProfileScreen extends StatelessWidget {
               icon: Icons.card_giftcard,
               label: 'Recompensas',
               isActive: false,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
@@ -582,6 +716,7 @@ class ProfileScreen extends StatelessWidget {
               icon: Icons.person,
               label: 'Perfil',
               isActive: true,
+              isDark: isDark,
             ),
           ),
         ],
@@ -593,6 +728,7 @@ class ProfileScreen extends StatelessWidget {
     required IconData icon,
     required String label,
     required bool isActive,
+    required bool isDark,
   }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -601,7 +737,9 @@ class ProfileScreen extends StatelessWidget {
           icon,
           color: isActive
               ? AppConstants.primaryColor
-              : AppConstants.textColor.withOpacity(0.5),
+              : (isDark
+                  ? AppConstants.hintColor.withOpacity(0.5)
+                  : AppConstants.textColor.withOpacity(0.5)),
           size: 24,
         ),
         const SizedBox(height: 4),
@@ -611,7 +749,9 @@ class ProfileScreen extends StatelessWidget {
             fontSize: 12,
             color: isActive
                 ? AppConstants.primaryColor
-                : AppConstants.textColor.withOpacity(0.5),
+                : (isDark
+                    ? AppConstants.hintColor.withOpacity(0.5)
+                    : AppConstants.textColor.withOpacity(0.5)),
             fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
             fontFamily: 'Public Sans',
           ),

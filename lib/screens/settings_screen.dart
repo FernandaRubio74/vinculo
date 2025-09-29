@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
-  bool isDarkMode = false;
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool notificationsEnabled = true;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = ref.watch(themeNotifierProvider).isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark 
-          ? AppConstants.backgroundDark 
+      backgroundColor: isDark
+          ? AppConstants.backgroundDark
           : AppConstants.backgroundColor,
       body: SafeArea(
         child: Column(
@@ -27,12 +28,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Container(
               padding: const EdgeInsets.all(AppConstants.defaultPadding),
               decoration: BoxDecoration(
-                color: (isDark 
-                    ? AppConstants.backgroundDark 
-                    : AppConstants.hintColor).withOpacity(0.9),
+                color: (isDark
+                        ? AppConstants.backgroundDark
+                        : AppConstants.hintColor)
+                    .withOpacity(0.9),
                 border: Border(
                   bottom: BorderSide(
-                    color: isDark 
+                    color: isDark
                         ? AppConstants.secondaryColor.withOpacity(0.3)
                         : Colors.grey.shade200,
                     width: 1,
@@ -45,8 +47,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onPressed: () => Navigator.pop(context),
                     icon: Icon(
                       Icons.arrow_back,
-                      color: isDark 
-                          ? AppConstants.hintColor 
+                      color: isDark
+                          ? AppConstants.hintColor
                           : AppConstants.textColor,
                     ),
                   ),
@@ -57,8 +59,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDark 
-                            ? AppConstants.hintColor 
+                        color: isDark
+                            ? AppConstants.hintColor
                             : AppConstants.backgroundDark,
                         fontFamily: 'Public Sans',
                       ),
@@ -93,28 +95,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: isDark 
-                                ? AppConstants.hintColor 
+                            color: isDark
+                                ? AppConstants.hintColor
                                 : AppConstants.textColor,
                             fontFamily: 'Public Sans',
                           ),
                         ),
                         subtitle: Text(
-                          isDarkMode ? 'Oscuro' : 'Claro',
+                          isDark ? 'Oscuro' : 'Claro',
                           style: TextStyle(
                             fontSize: 14,
-                            color: isDark 
+                            color: isDark
                                 ? AppConstants.hintColor.withOpacity(0.7)
                                 : AppConstants.textColor.withOpacity(0.6),
                             fontFamily: 'Public Sans',
                           ),
                         ),
-                        value: isDarkMode,
+                        value: isDark,
                         activeColor: AppConstants.primaryColor,
                         onChanged: (value) {
-                          setState(() {
-                            isDarkMode = value;
-                          });
+                          // Usar el theme provider para cambiar el tema
+                          ref
+                              .read(themeNotifierProvider.notifier)
+                              .toggleDarkmode();
                         },
                       ),
                     ),
@@ -136,8 +139,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: isDark 
-                                ? AppConstants.hintColor 
+                            color: isDark
+                                ? AppConstants.hintColor
                                 : AppConstants.textColor,
                             fontFamily: 'Public Sans',
                           ),
@@ -146,7 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           'Recibir notificaciones sobre nuevas actividades y actualizaciones.',
                           style: TextStyle(
                             fontSize: 14,
-                            color: isDark 
+                            color: isDark
                                 ? AppConstants.hintColor.withOpacity(0.7)
                                 : AppConstants.textColor.withOpacity(0.6),
                             fontFamily: 'Public Sans',
@@ -174,19 +177,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           _buildSettingTile(
                             isDark: isDark,
                             title: 'Configuración de privacidad',
-                            subtitle: 'Gestionar la visibilidad de tu perfil y datos.',
+                            subtitle:
+                                'Gestionar la visibilidad de tu perfil y datos.',
                             onTap: () => _showPrivacyDialog(context),
                           ),
                           Divider(
                             height: 1,
-                            color: isDark 
+                            color: isDark
                                 ? AppConstants.secondaryColor.withOpacity(0.2)
                                 : Colors.grey.shade200,
                           ),
                           _buildSettingTile(
                             isDark: isDark,
                             title: 'Tamaño del texto',
-                            subtitle: 'Ajustar el tamaño del texto para una mejor legibilidad.',
+                            subtitle:
+                                'Ajustar el tamaño del texto para una mejor legibilidad.',
                             onTap: () => _showTextSizeDialog(context),
                           ),
                         ],
@@ -233,23 +238,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: isDark 
-              ? AppConstants.hintColor 
-              : AppConstants.backgroundDark,
+          color: isDark ? AppConstants.hintColor : AppConstants.backgroundDark,
           fontFamily: 'Public Sans',
         ),
       ),
     );
   }
 
-  Widget _buildSettingCard({
-    required bool isDark,
-    required Widget child,
-  }) {
+  Widget _buildSettingCard({required bool isDark, required Widget child}) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark 
-            ? AppConstants.backgroundDark 
+        color: isDark
+            ? AppConstants.backgroundDark
             : AppConstants.backgroundColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
@@ -282,9 +282,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: iconColor ?? (isDark 
-              ? AppConstants.hintColor 
-              : AppConstants.textColor),
+          color: iconColor ??
+              (isDark ? AppConstants.hintColor : AppConstants.textColor),
           fontFamily: 'Public Sans',
         ),
       ),
@@ -292,7 +291,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         subtitle,
         style: TextStyle(
           fontSize: 14,
-          color: isDark 
+          color: isDark
               ? AppConstants.hintColor.withOpacity(0.7)
               : AppConstants.textColor.withOpacity(0.6),
           fontFamily: 'Public Sans',
@@ -300,7 +299,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       trailing: Icon(
         icon ?? Icons.chevron_right,
-        color: isDark 
+        color: isDark
             ? AppConstants.hintColor.withOpacity(0.5)
             : AppConstants.textColor.withOpacity(0.5),
       ),
@@ -309,12 +308,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showPrivacyDialog(BuildContext context) {
+    final isDark = ref.watch(themeNotifierProvider).isDarkMode;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        backgroundColor: isDark
+            ? AppConstants.backgroundDark
+            : AppConstants.backgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text(
           'Configuración de Privacidad',
           style: TextStyle(
@@ -323,11 +324,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             color: AppConstants.primaryColor,
           ),
         ),
-        content: const Text(
+        content: Text(
           'Aquí podrás gestionar la visibilidad de tu perfil, controlar quién puede verte en línea y configurar tus preferencias de privacidad.',
           style: TextStyle(
             fontFamily: 'Public Sans',
             fontSize: 16,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
           ),
         ),
         actions: [
@@ -348,12 +350,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showTextSizeDialog(BuildContext context) {
+    final isDark = ref.watch(themeNotifierProvider).isDarkMode;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        backgroundColor: isDark
+            ? AppConstants.backgroundDark
+            : AppConstants.backgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text(
           'Tamaño del Texto',
           style: TextStyle(
@@ -362,11 +366,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             color: AppConstants.primaryColor,
           ),
         ),
-        content: const Text(
+        content: Text(
           'Funcionalidad para ajustar el tamaño del texto en toda la aplicación para una mejor accesibilidad y legibilidad.',
           style: TextStyle(
             fontFamily: 'Public Sans',
             fontSize: 16,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
           ),
         ),
         actions: [
@@ -387,12 +392,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showLogoutDialog(BuildContext context) {
+    final isDark = ref.watch(themeNotifierProvider).isDarkMode;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        backgroundColor: isDark
+            ? AppConstants.backgroundDark
+            : AppConstants.backgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text(
           '¿Cerrar sesión?',
           style: TextStyle(
@@ -401,11 +408,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             color: AppConstants.accentColorLight,
           ),
         ),
-        content: const Text(
+        content: Text(
           '¿Estás seguro de que deseas cerrar sesión?',
           style: TextStyle(
             fontFamily: 'Public Sans',
             fontSize: 16,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
           ),
         ),
         actions: [
@@ -436,6 +444,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: TextStyle(
                 fontFamily: 'Public Sans',
                 fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ),
           ),

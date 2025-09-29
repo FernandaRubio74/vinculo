@@ -1,32 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
 
-class ContactProfileScreen extends StatelessWidget {
+class ContactProfileScreen extends ConsumerWidget {
   final Map<String, dynamic> contact;
-  
+
   const ContactProfileScreen({
     super.key,
     required this.contact,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = ref.watch(themeNotifierProvider).isDarkMode;
+
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: isDark
+          ? AppConstants.backgroundDark
+          : AppConstants.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back,
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
           ),
         ),
-        title: const Text(
+        title: Text(
           'Perfil',
           style: TextStyle(
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
             fontFamily: 'Public Sans',
@@ -39,32 +45,32 @@ class ContactProfileScreen extends StatelessWidget {
         child: Column(
           children: [
             // Header del perfil
-            _buildProfileHeader(context),
-            
+            _buildProfileHeader(context, isDark),
+
             const SizedBox(height: 32),
-            
+
             // Botones de acción
-            _buildActionButtons(context),
-            
+            _buildActionButtons(context, isDark),
+
             const SizedBox(height: 32),
-            
+
             // Sección "Sobre Elena"
-            _buildAboutSection(),
-            
+            _buildAboutSection(isDark),
+
             const SizedBox(height: 32),
-            
+
             // Sección de Intereses
-            _buildInterestsSection(),
-            
+            _buildInterestsSection(isDark),
+
             const SizedBox(height: 100), // Espacio para navegación inferior
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigation(context),
+      bottomNavigationBar: _buildBottomNavigation(context, isDark),
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context) {
+  Widget _buildProfileHeader(BuildContext context, bool isDark) {
     return Column(
       children: [
         // Avatar con verificación
@@ -75,7 +81,9 @@ class ContactProfileScreen extends StatelessWidget {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.orange.shade100,
+                color: isDark
+                    ? Colors.orange.shade800.withOpacity(0.3)
+                    : Colors.orange.shade100,
                 border: Border.all(
                   color: AppConstants.primaryColor,
                   width: 3,
@@ -84,7 +92,9 @@ class ContactProfileScreen extends StatelessWidget {
               child: Icon(
                 Icons.person,
                 size: 60,
-                color: Colors.orange.shade700,
+                color: isDark
+                    ? Colors.orange.shade300
+                    : Colors.orange.shade700,
               ),
             ),
             Positioned(
@@ -101,28 +111,30 @@ class ContactProfileScreen extends StatelessWidget {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Nombre
         Text(
           contact['name'] ?? 'Elena Ramírez',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontFamily: 'Public Sans',
           ),
         ),
-        
+
         const SizedBox(height: 4),
-        
+
         // Tipo de usuario
         Text(
           'Voluntaria',
           style: TextStyle(
             fontSize: 16,
-            color: AppConstants.textColor.withOpacity(0.7),
+            color: isDark
+                ? AppConstants.hintColor.withOpacity(0.7)
+                : AppConstants.textColor.withOpacity(0.7),
             fontFamily: 'Public Sans',
           ),
         ),
@@ -130,25 +142,25 @@ class ContactProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
+  Widget _buildActionButtons(BuildContext context, bool isDark) {
     return Row(
       children: [
         Expanded(
           child: OutlinedButton.icon(
-            onPressed: () => _startVideoCall(context),
+            onPressed: () => _startVideoCall(context, isDark),
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: AppConstants.primaryColor),
+              side: const BorderSide(color: AppConstants.primaryColor),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            icon: Icon(
+            icon: const Icon(
               Icons.videocam,
               color: AppConstants.primaryColor,
               size: 20,
             ),
-            label: Text(
+            label: const Text(
               'Videollamada',
               style: TextStyle(
                 color: AppConstants.primaryColor,
@@ -159,9 +171,9 @@ class ContactProfileScreen extends StatelessWidget {
             ),
           ),
         ),
-        
+
         const SizedBox(width: 12),
-        
+
         Expanded(
           child: ElevatedButton.icon(
             onPressed: () => _sendMessage(context),
@@ -172,6 +184,7 @@ class ContactProfileScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               padding: const EdgeInsets.symmetric(vertical: 16),
+              elevation: isDark ? 6 : 2,
             ),
             icon: const Icon(Icons.message, size: 20),
             label: const Text(
@@ -188,36 +201,44 @@ class ContactProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAboutSection() {
+  Widget _buildAboutSection(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Sobre Elena',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontFamily: 'Public Sans',
           ),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: isDark
+                ? AppConstants.backgroundDark.withOpacity(0.5)
+                : Colors.grey.shade50,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(
+              color: isDark
+                  ? AppConstants.primaryColor.withOpacity(0.2)
+                  : Colors.grey.shade200,
+            ),
           ),
           child: Text(
-            contact['bio'] ?? 
-            'Elena es una voluntaria apasionada por ayudar a los demás. Tiene experiencia en cuidado de personas mayores y disfruta de actividades como la lectura y la jardinería.',
+            contact['bio'] ??
+                'Elena es una voluntaria apasionada por ayudar a los demás. Tiene experiencia en cuidado de personas mayores y disfruta de actividades como la lectura y la jardinería.',
             style: TextStyle(
               fontSize: 16,
-              color: AppConstants.textColor,
+              color: isDark
+                  ? AppConstants.hintColor
+                  : AppConstants.textColor,
               fontFamily: 'Public Sans',
               height: 1.5,
             ),
@@ -227,24 +248,24 @@ class ContactProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInterestsSection() {
+  Widget _buildInterestsSection(bool isDark) {
     final interests = contact['interests'] ?? ['Lectura', 'Jardinería', 'Cuidado de mayores'];
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Intereses',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontFamily: 'Public Sans',
           ),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -252,17 +273,23 @@ class ContactProfileScreen extends StatelessWidget {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: AppConstants.primaryColor.withOpacity(0.1),
+                color: isDark
+                    ? AppConstants.primaryColor.withOpacity(0.3)
+                    : AppConstants.primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: AppConstants.primaryColor.withOpacity(0.3),
+                  color: isDark
+                      ? AppConstants.primaryColor.withOpacity(0.5)
+                      : AppConstants.primaryColor.withOpacity(0.3),
                 ),
               ),
               child: Text(
                 interest,
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppConstants.primaryColor,
+                  color: isDark
+                      ? AppConstants.hintColor
+                      : AppConstants.primaryColor,
                   fontWeight: FontWeight.w500,
                   fontFamily: 'Public Sans',
                 ),
@@ -274,16 +301,19 @@ class ContactProfileScreen extends StatelessWidget {
     );
   }
 
-  void _startVideoCall(BuildContext context) {
+  void _startVideoCall(BuildContext context, bool isDark) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: isDark
+            ? AppConstants.backgroundDark
+            : AppConstants.backgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
         title: Text(
           'Iniciar Videollamada',
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Public Sans',
             fontWeight: FontWeight.bold,
             color: AppConstants.primaryColor,
@@ -291,15 +321,20 @@ class ContactProfileScreen extends StatelessWidget {
         ),
         content: Text(
           '¿Deseas iniciar una videollamada con ${contact['name'] ?? 'Elena'}?',
-          style: const TextStyle(fontFamily: 'Public Sans'),
+          style: TextStyle(
+            fontFamily: 'Public Sans',
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
+            child: Text(
               'Cancelar',
               style: TextStyle(
-                color: Colors.grey,
+                color: isDark
+                    ? AppConstants.hintColor.withOpacity(0.7)
+                    : Colors.grey,
                 fontFamily: 'Public Sans',
               ),
             ),
@@ -309,7 +344,8 @@ class ContactProfileScreen extends StatelessWidget {
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Iniciando videollamada con ${contact['name'] ?? 'Elena'}...'),
+                  content: Text(
+                      'Iniciando videollamada con ${contact['name'] ?? 'Elena'}...'),
                   backgroundColor: AppConstants.primaryColor,
                 ),
               );
@@ -339,14 +375,27 @@ class ContactProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNavigation(BuildContext context) {
+  Widget _buildBottomNavigation(BuildContext context, bool isDark) {
     return Container(
       height: 80,
       decoration: BoxDecoration(
-        color: AppConstants.backgroundColor,
+        color: isDark
+            ? AppConstants.backgroundDark
+            : AppConstants.backgroundColor,
         border: Border(
-          top: BorderSide(color: Colors.grey.shade200),
+          top: BorderSide(
+            color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+          ),
         ),
+        boxShadow: isDark
+            ? [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ]
+            : [],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -359,6 +408,7 @@ class ContactProfileScreen extends StatelessWidget {
               icon: Icons.home,
               label: 'Inicio',
               isActive: false,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
@@ -369,6 +419,7 @@ class ContactProfileScreen extends StatelessWidget {
               icon: Icons.people,
               label: 'Matches',
               isActive: true,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
@@ -379,6 +430,7 @@ class ContactProfileScreen extends StatelessWidget {
               icon: Icons.card_giftcard,
               label: 'Recompensas',
               isActive: false,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
@@ -389,6 +441,7 @@ class ContactProfileScreen extends StatelessWidget {
               icon: Icons.person,
               label: 'Perfil',
               isActive: false,
+              isDark: isDark,
             ),
           ),
         ],
@@ -400,6 +453,7 @@ class ContactProfileScreen extends StatelessWidget {
     required IconData icon,
     required String label,
     required bool isActive,
+    required bool isDark,
   }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -408,7 +462,9 @@ class ContactProfileScreen extends StatelessWidget {
           icon,
           color: isActive
               ? AppConstants.primaryColor
-              : AppConstants.textColor.withOpacity(0.5),
+              : (isDark
+                  ? AppConstants.hintColor.withOpacity(0.5)
+                  : AppConstants.textColor.withOpacity(0.5)),
           size: 24,
         ),
         const SizedBox(height: 4),
@@ -418,7 +474,9 @@ class ContactProfileScreen extends StatelessWidget {
             fontSize: 12,
             color: isActive
                 ? AppConstants.primaryColor
-                : AppConstants.textColor.withOpacity(0.5),
+                : (isDark
+                    ? AppConstants.hintColor.withOpacity(0.5)
+                    : AppConstants.textColor.withOpacity(0.5)),
             fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
             fontFamily: 'Public Sans',
           ),

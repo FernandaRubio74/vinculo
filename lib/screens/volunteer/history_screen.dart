@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = ref.watch(themeNotifierProvider).isDarkMode;
+
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: isDark
+          ? AppConstants.backgroundDark
+          : AppConstants.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back,
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
           ),
         ),
-        title: const Text(
+        title: Text(
           'Historial',
           style: TextStyle(
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
             fontFamily: 'Public Sans',
@@ -35,48 +41,49 @@ class HistoryScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Sección de Resumen
-            _buildSummarySection(),
-            
+            _buildSummarySection(isDark),
+
             const SizedBox(height: 32),
-            
+
             // Sección de Videollamadas
-            _buildVideoCallsSection(),
-            
+            _buildVideoCallsSection(isDark),
+
             const SizedBox(height: 32),
-            
+
             // Sección de Otras Interacciones
-            _buildOtherInteractionsSection(),
-            
+            _buildOtherInteractionsSection(isDark),
+
             const SizedBox(height: 100), // Espacio para navegación inferior
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigation(context),
+      bottomNavigationBar: _buildBottomNavigation(context, isDark),
     );
   }
 
-  Widget _buildSummarySection() {
+  Widget _buildSummarySection(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Resumen',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontFamily: 'Public Sans',
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         Row(
           children: [
             Expanded(
               child: _buildSummaryCard(
                 title: 'Sesiones\nCompletadas',
                 value: '18',
+                isDark: isDark,
               ),
             ),
             const SizedBox(width: 24),
@@ -84,6 +91,7 @@ class HistoryScreen extends StatelessWidget {
               child: _buildSummaryCard(
                 title: 'Horas de\nVoluntariado',
                 value: '32',
+                isDark: isDark,
               ),
             ),
           ],
@@ -95,35 +103,53 @@ class HistoryScreen extends StatelessWidget {
   Widget _buildSummaryCard({
     required String title,
     required String value,
+    required bool isDark,
   }) {
-    return Column(
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 14,
-            color: AppConstants.textColor.withOpacity(0.7),
-            fontFamily: 'Public Sans',
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppConstants.primaryColor.withOpacity(0.2)
+            : AppConstants.primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: isDark
+            ? Border.all(
+                color: AppConstants.primaryColor.withOpacity(0.4),
+                width: 1,
+              )
+            : null,
+      ),
+      child: Column(
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 14,
+              color: isDark
+                  ? AppConstants.hintColor.withOpacity(0.8)
+                  : AppConstants.textColor.withOpacity(0.7),
+              fontFamily: 'Public Sans',
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
-        ),
-        
-        const SizedBox(height: 8),
-        
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 36,
-            fontWeight: FontWeight.bold,
-            color: AppConstants.textColor,
-            fontFamily: 'Public Sans',
+
+          const SizedBox(height: 8),
+
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+              color: AppConstants.primaryColor,
+              fontFamily: 'Public Sans',
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildVideoCallsSection() {
+  Widget _buildVideoCallsSection(bool isDark) {
     final videoCalls = [
       {
         'name': 'María González',
@@ -145,33 +171,43 @@ class HistoryScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Videollamadas',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontFamily: 'Public Sans',
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
-        ...videoCalls.map((call) => _buildVideoCallCard(call)),
+
+        ...videoCalls.map((call) => _buildVideoCallCard(call, isDark)),
       ],
     );
   }
 
-  Widget _buildVideoCallCard(Map<String, String> call) {
+  Widget _buildVideoCallCard(Map<String, String> call, bool isDark) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? AppConstants.backgroundDark.withOpacity(0.5)
+            : Colors.white,
         borderRadius: BorderRadius.circular(12),
+        border: isDark
+            ? Border.all(
+                color: AppConstants.primaryColor.withOpacity(0.2),
+                width: 1,
+              )
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: isDark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -184,18 +220,20 @@ class HistoryScreen extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: AppConstants.primaryColor.withOpacity(0.1),
+              color: isDark
+                  ? AppConstants.primaryColor.withOpacity(0.3)
+                  : AppConstants.primaryColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.videocam,
               color: AppConstants.primaryColor,
               size: 20,
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           // Información de la llamada
           Expanded(
             child: Column(
@@ -203,10 +241,12 @@ class HistoryScreen extends StatelessWidget {
               children: [
                 Text(
                   'Llamada con ${call['name']}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppConstants.textColor,
+                    color: isDark
+                        ? AppConstants.hintColor
+                        : AppConstants.textColor,
                     fontFamily: 'Public Sans',
                   ),
                 ),
@@ -215,7 +255,9 @@ class HistoryScreen extends StatelessWidget {
                   '${call['date']} • ${call['duration']}',
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppConstants.textColor.withOpacity(0.7),
+                    color: isDark
+                        ? AppConstants.hintColor.withOpacity(0.7)
+                        : AppConstants.textColor.withOpacity(0.7),
                     fontFamily: 'Public Sans',
                   ),
                 ),
@@ -227,7 +269,7 @@ class HistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOtherInteractionsSection() {
+  Widget _buildOtherInteractionsSection(bool isDark) {
     final interactions = [
       {
         'title': 'Visita a la residencia \'Amanecer\'',
@@ -249,33 +291,43 @@ class HistoryScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Otras Interacciones',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppConstants.textColor,
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             fontFamily: 'Public Sans',
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
-        ...interactions.map((interaction) => _buildInteractionCard(interaction)),
+
+        ...interactions.map((interaction) => _buildInteractionCard(interaction, isDark)),
       ],
     );
   }
 
-  Widget _buildInteractionCard(Map<String, dynamic> interaction) {
+  Widget _buildInteractionCard(Map<String, dynamic> interaction, bool isDark) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? AppConstants.backgroundDark.withOpacity(0.5)
+            : Colors.white,
         borderRadius: BorderRadius.circular(12),
+        border: isDark
+            ? Border.all(
+                color: AppConstants.primaryColor.withOpacity(0.2),
+                width: 1,
+              )
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: isDark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -288,7 +340,9 @@ class HistoryScreen extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: AppConstants.primaryColor.withOpacity(0.1),
+              color: isDark
+                  ? AppConstants.primaryColor.withOpacity(0.3)
+                  : AppConstants.primaryColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -297,9 +351,9 @@ class HistoryScreen extends StatelessWidget {
               size: 20,
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           // Información de la interacción
           Expanded(
             child: Column(
@@ -307,10 +361,12 @@ class HistoryScreen extends StatelessWidget {
               children: [
                 Text(
                   interaction['title'],
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppConstants.textColor,
+                    color: isDark
+                        ? AppConstants.hintColor
+                        : AppConstants.textColor,
                     fontFamily: 'Public Sans',
                   ),
                 ),
@@ -319,7 +375,9 @@ class HistoryScreen extends StatelessWidget {
                   interaction['date'],
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppConstants.textColor.withOpacity(0.7),
+                    color: isDark
+                        ? AppConstants.hintColor.withOpacity(0.7)
+                        : AppConstants.textColor.withOpacity(0.7),
                     fontFamily: 'Public Sans',
                   ),
                 ),
@@ -331,14 +389,27 @@ class HistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNavigation(BuildContext context) {
+  Widget _buildBottomNavigation(BuildContext context, bool isDark) {
     return Container(
       height: 80,
       decoration: BoxDecoration(
-        color: AppConstants.backgroundColor,
+        color: isDark
+            ? AppConstants.backgroundDark
+            : AppConstants.backgroundColor,
         border: Border(
-          top: BorderSide(color: Colors.grey.shade200),
+          top: BorderSide(
+            color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+          ),
         ),
+        boxShadow: isDark
+            ? [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ]
+            : [],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -351,6 +422,7 @@ class HistoryScreen extends StatelessWidget {
               icon: Icons.home,
               label: 'Inicio',
               isActive: false,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
@@ -361,6 +433,7 @@ class HistoryScreen extends StatelessWidget {
               icon: Icons.people,
               label: 'Matches',
               isActive: false,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
@@ -371,6 +444,7 @@ class HistoryScreen extends StatelessWidget {
               icon: Icons.card_giftcard,
               label: 'Recompensas',
               isActive: false,
+              isDark: isDark,
             ),
           ),
           GestureDetector(
@@ -381,6 +455,7 @@ class HistoryScreen extends StatelessWidget {
               icon: Icons.person,
               label: 'Perfil',
               isActive: true,
+              isDark: isDark,
             ),
           ),
         ],
@@ -392,6 +467,7 @@ class HistoryScreen extends StatelessWidget {
     required IconData icon,
     required String label,
     required bool isActive,
+    required bool isDark,
   }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -400,7 +476,9 @@ class HistoryScreen extends StatelessWidget {
           icon,
           color: isActive
               ? AppConstants.primaryColor
-              : AppConstants.textColor.withOpacity(0.5),
+              : (isDark
+                  ? AppConstants.hintColor.withOpacity(0.5)
+                  : AppConstants.textColor.withOpacity(0.5)),
           size: 24,
         ),
         const SizedBox(height: 4),
@@ -410,7 +488,9 @@ class HistoryScreen extends StatelessWidget {
             fontSize: 12,
             color: isActive
                 ? AppConstants.primaryColor
-                : AppConstants.textColor.withOpacity(0.5),
+                : (isDark
+                    ? AppConstants.hintColor.withOpacity(0.5)
+                    : AppConstants.textColor.withOpacity(0.5)),
             fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
             fontFamily: 'Public Sans',
           ),

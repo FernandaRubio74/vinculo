@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
 
-class ProfileElderlyScreen extends StatefulWidget {
+class ProfileElderlyScreen extends ConsumerStatefulWidget {
   final String userName;
   final int userAge;
   final List<String> userInterests;
@@ -14,13 +16,13 @@ class ProfileElderlyScreen extends StatefulWidget {
   });
 
   @override
-  State<ProfileElderlyScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileElderlyScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileElderlyScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = ref.watch(themeNotifierProvider).isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark
@@ -63,8 +65,8 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
                     icon: Icon(
                       Icons.settings,
                       color: isDark
-                          ? AppConstants.backgroundColor.withOpacity(0.8)
-                          : AppConstants.backgroundDark.withOpacity(0.8),
+                          ? AppConstants.hintColor
+                          : AppConstants.textColor,
                       size: 30,
                     ),
                   ),
@@ -92,7 +94,9 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
                             color: AppConstants.primaryColor.withOpacity(0.2),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: isDark 
+                                    ? Colors.black.withOpacity(0.3)
+                                    : Colors.black.withOpacity(0.1),
                                 blurRadius: 16,
                                 offset: const Offset(0, 4),
                               ),
@@ -114,8 +118,8 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
                             color: isDark
-                                ? Colors.white
-                                : AppConstants.backgroundDark,
+                                ? AppConstants.hintColor
+                                : AppConstants.textColor,
                             fontFamily: 'Public Sans',
                           ),
                         ),
@@ -128,8 +132,8 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             color: isDark
-                                ? AppConstants.hintColor
-                                : AppConstants.textColor,
+                                ? AppConstants.hintColor.withOpacity(0.7)
+                                : AppConstants.textColor.withOpacity(0.7),
                             fontFamily: 'Public Sans',
                           ),
                         ),
@@ -148,8 +152,8 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: isDark
-                                ? Colors.white
-                                : AppConstants.backgroundDark,
+                                ? AppConstants.hintColor
+                                : AppConstants.textColor,
                             fontFamily: 'Public Sans',
                           ),
                         ),
@@ -168,17 +172,23 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
                                 vertical: AppConstants.smallPadding,
                               ),
                               decoration: BoxDecoration(
-                                color: AppConstants.primaryColor.withOpacity(
-                                  0.2,
-                                ),
+                                color: isDark
+                                    ? AppConstants.primaryColor.withOpacity(0.3)
+                                    : AppConstants.primaryColor.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(25),
+                                border: Border.all(
+                                  color: AppConstants.primaryColor,
+                                  width: 1,
+                                ),
                               ),
                               child: Text(
                                 interest,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: AppConstants.primaryColor,
+                                  color: isDark
+                                      ? AppConstants.hintColor
+                                      : AppConstants.primaryColor,
                                   fontFamily: 'Public Sans',
                                 ),
                               ),
@@ -205,7 +215,10 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              elevation: 2,
+                              elevation: isDark ? 8 : 2,
+                              shadowColor: isDark
+                                  ? AppConstants.primaryColor.withOpacity(0.5)
+                                  : AppConstants.primaryColor.withOpacity(0.3),
                             ),
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -234,16 +247,22 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
                             onPressed: _viewHistory,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: isDark
-                                  ? AppConstants.backgroundDark
+                                  ? AppConstants.backgroundDark.withOpacity(0.5)
                                   : AppConstants.hintColor,
                               foregroundColor: isDark
-                                  ? Colors.white
-                                  : AppConstants.backgroundDark,
+                                  ? AppConstants.hintColor
+                                  : AppConstants.textColor,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
+                                side: BorderSide(
+                                  color: isDark
+                                      ? AppConstants.hintColor.withOpacity(0.3)
+                                      : Colors.transparent,
+                                  width: 1,
+                                ),
                               ),
-                              elevation: 2,
+                              elevation: isDark ? 4 : 2,
                             ),
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -275,13 +294,11 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
       ),
 
       // Bottom Navigation
-      bottomNavigationBar: _buildBottomNavigation(context),
+      bottomNavigationBar: _buildBottomNavigation(context, isDark),
     );
   }
 
-  Widget _buildBottomNavigation(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
+  Widget _buildBottomNavigation(BuildContext context, bool isDark) {
     return Container(
       decoration: BoxDecoration(
         color: isDark
@@ -293,6 +310,15 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
             width: 1,
           ),
         ),
+        boxShadow: isDark
+            ? [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ]
+            : [],
       ),
       child: SafeArea(
         top: false,
@@ -309,6 +335,7 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
                 icon: Icons.home,
                 label: 'Inicio',
                 isActive: false,
+                isDark: isDark,
                 onTap: () =>
                     Navigator.pushReplacementNamed(context, '/home_elderly'),
               ),
@@ -317,6 +344,7 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
                 icon: Icons.person,
                 label: 'Perfil',
                 isActive: true,
+                isDark: isDark,
                 onTap: () {},
               ),
               _buildNavItem(
@@ -324,6 +352,7 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
                 icon: Icons.local_activity,
                 label: 'Actividades',
                 isActive: false,
+                isDark: isDark,
                 onTap: () => Navigator.pushReplacementNamed(
                   context,
                   '/activities_elderly',
@@ -341,10 +370,9 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
     required IconData icon,
     required String label,
     required bool isActive,
+    required bool isDark,
     required VoidCallback onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -354,7 +382,9 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
             icon,
             color: isActive
                 ? AppConstants.primaryColor
-                : (isDark ? AppConstants.hintColor : AppConstants.textColor),
+                : (isDark 
+                    ? AppConstants.hintColor.withOpacity(0.5)
+                    : AppConstants.textColor.withOpacity(0.5)),
             size: 30,
           ),
           const SizedBox(height: 4),
@@ -364,7 +394,9 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
               fontSize: 12,
               color: isActive
                   ? AppConstants.primaryColor
-                  : (isDark ? AppConstants.hintColor : AppConstants.textColor),
+                  : (isDark 
+                      ? AppConstants.hintColor.withOpacity(0.5)
+                      : AppConstants.textColor.withOpacity(0.5)),
               fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
               fontFamily: 'Public Sans',
             ),
@@ -377,34 +409,46 @@ class _ProfileScreenState extends State<ProfileElderlyScreen> {
   void _editProfile() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text(
-          'Editar Perfil',
-          style: TextStyle(
-            fontFamily: 'Public Sans',
-            fontWeight: FontWeight.bold,
-            color: AppConstants.primaryColor,
-          ),
-        ),
-        content: const Text(
-          'Funcionalidad para editar tu perfil personal, cambiar foto, actualizar intereses y información de contacto.',
-          style: TextStyle(fontFamily: 'Public Sans', fontSize: 16),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Cerrar',
-              style: TextStyle(
-                color: AppConstants.primaryColor,
-                fontFamily: 'Public Sans',
-                fontWeight: FontWeight.bold,
-              ),
+      builder: (context) {
+        final isDark = ref.watch(themeNotifierProvider).isDarkMode;
+        return AlertDialog(
+          backgroundColor: isDark 
+              ? AppConstants.backgroundDark 
+              : AppConstants.backgroundColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: const Text(
+            'Editar Perfil',
+            style: TextStyle(
+              fontFamily: 'Public Sans',
+              fontWeight: FontWeight.bold,
+              color: AppConstants.primaryColor,
             ),
           ),
-        ],
-      ),
+          content: Text(
+            'Funcionalidad para editar tu perfil personal, cambiar foto, actualizar intereses y información de contacto.',
+            style: TextStyle(
+              fontFamily: 'Public Sans', 
+              fontSize: 16,
+              color: isDark 
+                  ? AppConstants.hintColor 
+                  : AppConstants.textColor,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'Cerrar',
+                style: TextStyle(
+                  color: AppConstants.primaryColor,
+                  fontFamily: 'Public Sans',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
