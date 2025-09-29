@@ -234,17 +234,17 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                     _buildNavItem(
                       icon: Icons.home,
                       label: 'Inicio',
-                      onTap: () => _exitCall('/home'),
+                      onTap: () => _exitCall('/home_elderly'),
                     ),
                     _buildNavItem(
                       icon: Icons.person,
                       label: 'Perfil',
-                      onTap: () => _exitCall('/profile'),
+                      onTap: () => _exitCall('/profile_elderly'),
                     ),
                     _buildNavItem(
                       icon: Icons.local_activity,
                       label: 'Actividades',
-                      onTap: () => _exitCall('/activities'),
+                      onTap: () => _exitCall('/activities_elderly'),
                     ),
                   ],
                 ),
@@ -381,6 +381,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
             child: const Text(
               'Finalizar',
               style: TextStyle(
+                color: Colors.white,
                 fontFamily: 'Public Sans',
                 fontWeight: FontWeight.bold,
               ),

@@ -37,7 +37,7 @@ class VolunteerHomeScreen extends StatelessWidget {
           children: [
             // Saludo personalizado
             const Text(
-              '¡Hola, Sofía!',
+              '¡Hola, Carlos!',
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
