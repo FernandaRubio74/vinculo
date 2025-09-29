@@ -3,10 +3,10 @@ import 'package:vinculo/utils/constants.dart';
 
 class HomeElderlyScreen extends StatefulWidget {
   final String userName;
-  
+
   const HomeElderlyScreen({
     super.key,
-    this.userName = 'Carlos',
+    this.userName = 'Elena',
   });
 
   @override
@@ -15,41 +15,42 @@ class HomeElderlyScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeElderlyScreen> {
   bool _hasNotifications = true;
-  
-  // Lista de personas disponibles para conectar
-  final List<Person> _availablePeople = [
-    Person(
+
+  final List<PersonProfile> _availablePeople = [
+    PersonProfile(
       name: 'Sofía',
-      interest: 'Le gusta la música',
+      age: 23,
+      description: 'A Sofía le encanta tocar la guitarra y visitar museos de arte. También es voluntaria en un refugio de animales.',
+      interests: [
+        Interest(name: 'Música', icon: Icons.music_note, isPrimary: true),
+        Interest(name: 'Arte', icon: Icons.brush, isPrimary: false),
+        Interest(name: 'Animales', icon: Icons.pets, isPrimary: false),
+      ],
       avatar: Icons.person,
-      color: Colors.purple,
+      color: AppConstants.primaryColor,
     ),
-    Person(
+    PersonProfile(
       name: 'Ana',
-      interest: 'Le gusta la cocina',
+      age: 25,
+      description: 'Ana disfruta probando nuevas recetas, dando largos paseos por el parque y leyendo novelas históricas.',
+      interests: [
+        Interest(name: 'Cocina', icon: Icons.restaurant_menu, isPrimary: true),
+        Interest(name: 'Naturaleza', icon: Icons.park, isPrimary: false),
+        Interest(name: 'Lectura', icon: Icons.book, isPrimary: false),
+      ],
       avatar: Icons.person,
       color: Colors.orange,
-    ),
-    Person(
-      name: 'Miguel',
-      interest: 'Le gusta la jardinería',
-      avatar: Icons.person,
-      color: Colors.green,
-    ),
-    Person(
-      name: 'Elena',
-      interest: 'Le gusta la lectura',
-      avatar: Icons.person,
-      color: Colors.brown,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: isDark
+          ? AppConstants.backgroundDark
+          : AppConstants.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -57,9 +58,10 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
             Container(
               padding: const EdgeInsets.all(AppConstants.largePadding),
               decoration: BoxDecoration(
-                color: (isDark 
-                    ? AppConstants.backgroundColor
-                    : AppConstants.primaryColor).withOpacity(0.9),
+                color: (isDark
+                        ? AppConstants.backgroundDark
+                        : AppConstants.backgroundColor)
+                    .withOpacity(0.8),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -72,7 +74,9 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
                         'Hola de nuevo,',
                         style: TextStyle(
                           fontSize: 20,
-                          color: AppConstants.textColor,
+                          color: isDark
+                              ? AppConstants.hintColor
+                              : AppConstants.textColor,
                           fontFamily: 'Public Sans',
                         ),
                       ),
@@ -81,13 +85,15 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
                         style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onBackground,
+                          color: isDark
+                              ? Colors.white
+                              : AppConstants.backgroundDark,
                           fontFamily: 'Public Sans',
                         ),
                       ),
                     ],
                   ),
-                  
+
                   // Botón de notificaciones
                   Stack(
                     children: [
@@ -96,7 +102,9 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
                         icon: Icon(
                           Icons.notifications,
                           size: 30,
-                          color: AppConstants.textColor,
+                          color: isDark
+                              ? AppConstants.hintColor
+                              : AppConstants.textColor,
                         ),
                       ),
                       if (_hasNotifications)
@@ -107,12 +115,8 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
                             width: 12,
                             height: 12,
                             decoration: BoxDecoration(
-                              color: AppConstants.accentColor,
+                              color: Colors.orange,
                               shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppConstants.backgroundColor,
-                                width: 2,
-                              ),
                             ),
                           ),
                         ),
@@ -121,7 +125,7 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
                 ],
               ),
             ),
-            
+
             // Contenido principal scrollable
             Expanded(
               child: SingleChildScrollView(
@@ -132,7 +136,7 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: AppConstants.defaultPadding),
-                    
+
                     // Sección "Conecta con alguien hoy"
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,39 +146,34 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onBackground,
+                            color: isDark
+                                ? Colors.white
+                                : AppConstants.backgroundDark,
                             fontFamily: 'Public Sans',
                           ),
                         ),
                         const SizedBox(height: AppConstants.defaultPadding),
-                        
-                        // Grid de personas
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: AppConstants.defaultPadding,
-                            mainAxisSpacing: AppConstants.defaultPadding,
-                            childAspectRatio: 0.85,
-                          ),
-                          itemCount: _availablePeople.length,
-                          itemBuilder: (context, index) {
-                            final person = _availablePeople[index];
-                            return _buildPersonCard(context, person);
-                          },
+
+                        // Lista de personas (vertical en lugar de grid)
+                        Column(
+                          children: _availablePeople
+                              .map((person) => Padding(
+                                    padding: const EdgeInsets.only(
+                                      bottom: AppConstants.largePadding,
+                                    ),
+                                    child: _buildPersonCard(context, person),
+                                  ))
+                              .toList(),
                         ),
                       ],
                     ),
-                    
-                    const SizedBox(height: AppConstants.largePadding),
-                    
+
                     // Sección "Explora Actividades"
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(AppConstants.largePadding),
                       decoration: BoxDecoration(
-                        color: AppConstants.accentColor.withOpacity(0.2),
+                         color: const Color(0xFFff9800).withOpacity(0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -188,7 +187,9 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).colorScheme.onBackground,
+                                    color: isDark
+                                        ? Colors.white
+                                        : AppConstants.backgroundDark,
                                     fontFamily: 'Public Sans',
                                   ),
                                 ),
@@ -197,7 +198,9 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
                                   'Descubre eventos y grupos cerca de ti.',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: AppConstants.textColor,
+                                    color: isDark
+                                        ? AppConstants.hintColor
+                                        : AppConstants.textColor,
                                     fontFamily: 'Public Sans',
                                   ),
                                 ),
@@ -208,7 +211,7 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
                           ElevatedButton(
                             onPressed: _exploreActivities,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppConstants.accentColor,
+                              backgroundColor: const Color(0xFFff9800),
                               foregroundColor: Colors.white,
                               shape: const CircleBorder(),
                               padding: const EdgeInsets.all(12),
@@ -222,12 +225,7 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
                         ],
                       ),
                     ),
-                    
-                    const SizedBox(height: AppConstants.largePadding),
-                    
-                    // Sección adicional - Actividades recientes
-                    _buildRecentActivitiesSection(context),
-                    
+
                     const SizedBox(height: 100), // Espacio para la navegación
                   ],
                 ),
@@ -236,18 +234,20 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
           ],
         ),
       ),
-      
+
       // Bottom Navigation
       bottomNavigationBar: _buildBottomNavigation(context),
     );
   }
 
-  Widget _buildPersonCard(BuildContext context, Person person) {
+  Widget _buildPersonCard(BuildContext context, PersonProfile person) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: isDark
+            ? AppConstants.backgroundDark
+            : AppConstants.backgroundColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -257,82 +257,181 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.defaultPadding),
-        child: Column(
-          children: [
-            // Avatar
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: person.color.withOpacity(0.2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Imagen de perfil con gradiente y nombre
+          Container(
+            height: 200,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
               ),
-              child: Icon(
-                person.avatar,
-                size: 40,
-                color: person.color,
-              ),
-            ),
-            
-            const SizedBox(height: 12),
-            
-            // Información de la persona
-            Expanded(
-              child: Column(
-                children: [
-                  Text(
-                    person.name,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontFamily: 'Public Sans',
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    person.interest,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppConstants.textColor,
-                      fontFamily: 'Public Sans',
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  person.color.withOpacity(0.6),
+                  person.color.withOpacity(0.8),
                 ],
               ),
             ),
-            
-            const SizedBox(height: 12),
-            
-            // Botón conectar
-            SizedBox(
+            child: Stack(
+              children: [
+                // Icono de persona centrado
+                Center(
+                  child: Icon(
+                    person.avatar,
+                    size: 80,
+                    color: Colors.white,
+                  ),
+                ),
+                // Gradiente inferior con nombre
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.6),
+                        ],
+                      ),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(12),
+                        bottomRight: Radius.circular(12),
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(AppConstants.defaultPadding),
+                    child: Text(
+                      '${person.name}, ${person.age}',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontFamily: 'Public Sans',
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Contenido de la card
+          Padding(
+            padding: const EdgeInsets.all(AppConstants.defaultPadding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Tags de intereses
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: person.interests.map((interest) {
+                    final isPrimary = interest.isPrimary;
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isPrimary
+                            ? AppConstants.primaryColor.withOpacity(0.1)
+                            : (isDark
+                                ? AppConstants.backgroundDark
+                                : AppConstants.hintColor),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            interest.icon,
+                            size: 16,
+                            color: isPrimary
+                                ? AppConstants.primaryColor
+                                : (isDark
+                                    ? AppConstants.hintColor
+                                    : AppConstants.textColor),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            interest.name,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: isPrimary
+                                  ? AppConstants.primaryColor
+                                  : (isDark
+                                      ? AppConstants.hintColor
+                                      : AppConstants.textColor),
+                              fontFamily: 'Public Sans',
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+
+                const SizedBox(height: AppConstants.defaultPadding),
+
+                // Descripción
+                Text(
+                  person.description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark
+                        ? AppConstants.hintColor
+                        : AppConstants.textColor,
+                    fontFamily: 'Public Sans',
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Botón conectar
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppConstants.defaultPadding,
+              0,
+              AppConstants.defaultPadding,
+              AppConstants.defaultPadding,
+            ),
+            child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => _connectWithPerson(person),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppConstants.primaryColor.withOpacity(0.1),
-                  foregroundColor: AppConstants.primaryColor,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  backgroundColor: AppConstants.primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(25),
                   ),
+                  elevation: 2,
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.phone,
-                      size: 16,
+                      size: 20,
                     ),
-                    const SizedBox(width: 4),
-                    const Text(
+                    SizedBox(width: 8),
+                    Text(
                       'Conectar',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Public Sans',
                       ),
@@ -340,124 +439,6 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
                   ],
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRecentActivitiesSection(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Actividades Recientes',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onBackground,
-            fontFamily: 'Public Sans',
-          ),
-        ),
-        const SizedBox(height: AppConstants.defaultPadding),
-        
-        // Lista de actividades
-        Container(
-          padding: const EdgeInsets.all(AppConstants.defaultPadding),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              _buildActivityItem(
-                context,
-                'Llamada con Ana',
-                'Hace 2 horas',
-                Icons.call,
-                AppConstants.primaryColor,
-              ),
-              const Divider(),
-              _buildActivityItem(
-                context,
-                'Evento de jardinería',
-                'Ayer',
-                Icons.local_florist,
-                Colors.green,
-              ),
-              const Divider(),
-              _buildActivityItem(
-                context,
-                'Mensaje de Sofía',
-                'Hace 3 días',
-                Icons.message,
-                Colors.blue,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActivityItem(
-    BuildContext context,
-    String title,
-    String time,
-    IconData icon,
-    Color color,
-  ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontFamily: 'Public Sans',
-                  ),
-                ),
-                Text(
-                  time,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppConstants.textColor,
-                    fontFamily: 'Public Sans',
-                  ),
-                ),
-              ],
             ),
           ),
         ],
@@ -467,13 +448,18 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
 
   Widget _buildBottomNavigation(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       decoration: BoxDecoration(
-        color: AppConstants.textColor,
+        color: (isDark
+                ? AppConstants.backgroundDark
+                : AppConstants.backgroundColor)
+            .withOpacity(0.95),
         border: Border(
           top: BorderSide(
-            color: Colors.grey.shade200,
+            color: isDark
+                ? Colors.grey.shade700.withOpacity(0.5)
+                : Colors.grey.shade200,
             width: 0.5,
           ),
         ),
@@ -501,14 +487,14 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
                 icon: Icons.person_outline,
                 label: 'Perfil',
                 isActive: false,
-                onTap: () => Navigator.pushNamed(context, '/profile'),
+                onTap: () => Navigator.pushNamed(context, '/profile_elderly'),
               ),
               _buildNavItem(
                 context: context,
                 icon: Icons.local_activity,
                 label: 'Actividades',
                 isActive: false,
-                onTap: () => Navigator.pushNamed(context, '/activities'),
+                onTap: () => Navigator.pushNamed(context, '/activities_elderly'),
               ),
             ],
           ),
@@ -525,7 +511,7 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
     required VoidCallback onTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -533,9 +519,11 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
         children: [
           Icon(
             icon,
-            color: isActive 
-                ? AppConstants.primaryColor 
-                : AppConstants.textColor.withOpacity( 0.5),
+            color: isActive
+                ? AppConstants.primaryColor
+                : (isDark
+                    ? AppConstants.hintColor
+                    : AppConstants.textColor),
             size: 24,
           ),
           const SizedBox(height: 4),
@@ -543,9 +531,11 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
             label,
             style: TextStyle(
               fontSize: 12,
-              color: isActive 
-                  ? AppConstants.primaryColor 
-                  : AppConstants.textColor.withOpacity(0.5),
+              color: isActive
+                  ? AppConstants.primaryColor
+                  : (isDark
+                      ? AppConstants.hintColor
+                      : AppConstants.textColor),
               fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
               fontFamily: 'Public Sans',
             ),
@@ -559,7 +549,7 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
     setState(() {
       _hasNotifications = false;
     });
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Notificaciones revisadas'),
@@ -569,7 +559,7 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
     );
   }
 
-  void _connectWithPerson(Person person) {
+  void _connectWithPerson(PersonProfile person) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -585,7 +575,7 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
           ),
         ),
         content: Text(
-          '¿Te gustaría iniciar una conversación con ${person.name}?',
+          '¿Te gustaría conectar con ${person.name}?',
           style: const TextStyle(
             fontFamily: 'Public Sans',
             fontSize: 16,
@@ -594,10 +584,12 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
+            child: Text(
               'Cancelar',
               style: TextStyle(
-                color: AppConstants.accentColorLight,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppConstants.hintColor
+                    : AppConstants.textColor,
                 fontFamily: 'Public Sans',
               ),
             ),
@@ -605,21 +597,17 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Conectando con ${person.name}...'),
-                  backgroundColor: AppConstants.primaryColor,
-                ),
-              );
+              Navigator.pushNamed(context, '/videocall');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppConstants.primaryColor,
             ),
             child: const Text(
-              'Conectar',
+              'Aceptar',
               style: TextStyle(
                 fontFamily: 'Public Sans',
                 fontWeight: FontWeight.bold,
+                color: Colors.white
               ),
             ),
           ),
@@ -629,26 +617,37 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
   }
 
   void _exploreActivities() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Navegando a actividades...'),
-        backgroundColor: AppConstants.accentColor,
-      ),
-    );
+    Navigator.pushNamed(context, '/activities_elderly');
   }
 }
 
-// Clase para representar una persona
-class Person {
+// Clases para representar los datos
+class PersonProfile {
   final String name;
-  final String interest;
+  final int age;
+  final String description;
+  final List<Interest> interests;
   final IconData avatar;
   final Color color;
 
-  Person({
+  PersonProfile({
     required this.name,
-    required this.interest,
+    required this.age,
+    required this.description,
+    required this.interests,
     required this.avatar,
     required this.color,
+  });
+}
+
+class Interest {
+  final String name;
+  final IconData icon;
+  final bool isPrimary;
+
+  Interest({
+    required this.name,
+    required this.icon,
+    required this.isPrimary,
   });
 }
