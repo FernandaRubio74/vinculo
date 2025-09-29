@@ -19,7 +19,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       backgroundColor: isDark 
           ? AppConstants.backgroundDark 
-          : AppConstants.hintColor,
+          : AppConstants.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
