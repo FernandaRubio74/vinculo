@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart'; // ← NUEVO IMPORT
 import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
 
@@ -44,7 +45,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => context.pop(), // ← CAMBIO 1
                     icon: Icon(
                       Icons.arrow_back,
                       color: isDark
@@ -114,7 +115,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         value: isDark,
                         activeColor: AppConstants.primaryColor,
                         onChanged: (value) {
-                          // Usar el theme provider para cambiar el tema
                           ref
                               .read(themeNotifierProvider.notifier)
                               .toggleDarkmode();
@@ -334,7 +334,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => context.pop(), // ← CAMBIO 2
             child: const Text(
               'Entendido',
               style: TextStyle(
@@ -376,7 +376,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => context.pop(), // ← CAMBIO 3
             child: const Text(
               'Entendido',
               style: TextStyle(
@@ -418,7 +418,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => context.pop(), // ← CAMBIO 4
             child: const Text(
               'Cancelar',
               style: TextStyle(
@@ -429,12 +429,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/login',
-                (route) => false,
-              );
+              context.pop(); // ← CAMBIO 5 (cierra el diálogo)
+              context.go('/login'); // ← CAMBIO 6 (navega a login y limpia stack)
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppConstants.accentColorLight,

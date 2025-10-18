@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vinculo/utils/constants.dart';
 import 'package:vinculo/widgets/custom_text_field.dart';
 
@@ -485,8 +486,8 @@ class _RegisterElderlyScreenState extends State<RegisterElderlyScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Cierra el modal
-                    Navigator.pushReplacementNamed(context, '/home_elderly'); // <-- Cambia aquí la ruta
+                    context.pop(); // Cierra el modal
+                    context.go('/elderly/home'); // Navega al home de elderly
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppConstants.primaryColor,

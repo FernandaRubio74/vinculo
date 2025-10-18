@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vinculo/utils/constants.dart';
 
 class ActivitiesScreen extends StatefulWidget {
@@ -62,7 +63,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => Navigator.pushNamed(context, '/settings'),
+                    onPressed: () => context.go('/settings'),
                     icon: Icon(
                       Icons.settings,
                       color: isDark
@@ -228,14 +229,14 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                     icon: Icons.home,
                     label: 'Inicio',
                     isActive: false,
-                    onTap: () => Navigator.pushReplacementNamed(context, '/home_elderly'),
+                    onTap: () => context.go('/elderly/home'),
                   ),
                   _buildNavItem(
                     context: context,
                     icon: Icons.person,
                     label: 'Perfil',
                     isActive: false,
-                    onTap: () => Navigator.pushReplacementNamed(context, '/profile_elderly'),
+                    onTap: () => context.go('/elderly/profile'),
                   ),
                   _buildNavItem(
                     context: context,
@@ -298,7 +299,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
 
   void _handleActivityTap(BuildContext context, ActivityOption activity) {
     if (activity.title == 'Videollamada') {
-      Navigator.pushReplacementNamed(context, '/video_call');
+      context.go('/elderly/activities/volunteers');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

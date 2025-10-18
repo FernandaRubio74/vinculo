@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart'; // ← NUEVO IMPORT
 import 'package:vinculo/utils/constants.dart';
 import 'package:vinculo/widgets/custom_header.dart';
 import 'package:vinculo/widgets/custom_text_field.dart';
@@ -34,7 +35,7 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
         child: Column(
           children: [
             // Header con botón de retroceso
-            CustomHeader(showBack: true),
+            const CustomHeader(showBack: true),
             // Contenido principal scrollable
             Expanded(
               child: SingleChildScrollView(
@@ -174,7 +175,7 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
                           ),
                         ),
                         TextButton(
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () => context.pop(), // ← CAMBIO 1
                           child: const Text(
                             'Inicia sesión',
                             style: TextStyle(
@@ -263,7 +264,7 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
   }
 
   void _handleRegister() {
-    // Implementar lógica de registro
+    // Validación de campos
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
@@ -276,7 +277,8 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
       );
       return;
     }
+    
     // Navegar a la siguiente pantalla (selección de rol)
-    Navigator.pushReplacementNamed(context, '/roles');
+    context.go('/roles'); // ← CAMBIO 2
   }
 }

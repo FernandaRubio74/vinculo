@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class VolunteersScreen extends StatelessWidget {
   const VolunteersScreen({super.key});
@@ -36,7 +37,7 @@ class VolunteersScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () => context.pop(),
         ),
         title: const Text(
           "Voluntarios Disponibles",
@@ -105,7 +106,7 @@ class VolunteersScreen extends StatelessWidget {
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/video_call');
+                      context.go('/elderly/videocall?contact=${volunteer["name"]}');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF13a4ec),
@@ -116,7 +117,7 @@ class VolunteersScreen extends StatelessWidget {
                     ),
                     icon: const Icon(
                       Icons.videocam,
-                    ), // cambié el ícono a videollamada
+                    ),
                     label: const Text("Videollamada"),
                   ),
                 ],

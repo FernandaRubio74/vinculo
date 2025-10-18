@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
 
@@ -61,7 +62,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => Navigator.pushNamed(context, '/settings'),
+                    onPressed: () => context.go('/settings'),
                     icon: Icon(
                       Icons.settings,
                       color: isDark
@@ -336,8 +337,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
                 label: 'Inicio',
                 isActive: false,
                 isDark: isDark,
-                onTap: () =>
-                    Navigator.pushReplacementNamed(context, '/home_elderly'),
+                onTap: () => context.go('/elderly/home'),
               ),
               _buildNavItem(
                 context: context,
@@ -353,10 +353,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
                 label: 'Actividades',
                 isActive: false,
                 isDark: isDark,
-                onTap: () => Navigator.pushReplacementNamed(
-                  context,
-                  '/activities_elderly',
-                ),
+                onTap: () => context.go('/elderly/activities'),
               ),
             ],
           ),
@@ -436,7 +433,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => context.pop(),
               child: const Text(
                 'Cerrar',
                 style: TextStyle(
@@ -453,6 +450,8 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
   }
 
   void _viewHistory() {
-    Navigator.pushReplacementNamed(context, '/history_screen');
+    // Nota: Asume que hay una ruta de historial para elderly
+    // Ajusta según tu go_router configuration
+    context.go('/elderly/history');
   }
 }

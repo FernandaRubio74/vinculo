@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
 
@@ -18,7 +19,7 @@ class ProfileScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
           icon: Icon(
             Icons.arrow_back,
             color: isDark ? AppConstants.hintColor : AppConstants.textColor,
@@ -36,14 +37,14 @@ class ProfileScreen extends ConsumerWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () => Navigator.pushNamed(context, '/history'),
+            onPressed: () => context.go('/volunteer/profile/history'),
             icon: Icon(
               Icons.history,
               color: isDark ? AppConstants.hintColor : AppConstants.textColor,
             ),
           ),
           IconButton(
-            onPressed: () => Navigator.pushNamed(context, '/settings'),
+            onPressed: () => context.go('/settings'),
             icon: Icon(
               Icons.settings,
               color: isDark ? AppConstants.hintColor : AppConstants.textColor,
@@ -161,7 +162,7 @@ class ProfileScreen extends ConsumerWidget {
 
         // Botón Ver Historial
         OutlinedButton.icon(
-          onPressed: () => Navigator.pushNamed(context, '/history'),
+          onPressed: () => context.go('/volunteer/profile/history'),
           style: OutlinedButton.styleFrom(
             side: BorderSide(color: AppConstants.primaryColor),
             shape: RoundedRectangleBorder(
@@ -676,9 +677,7 @@ class ProfileScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           GestureDetector(
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/volunteer_home');
-            },
+            onTap: () => context.go('/volunteer/home'),
             child: _buildNavItem(
               icon: Icons.home,
               label: 'Inicio',
@@ -687,9 +686,7 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/matches');
-            },
+            onTap: () => context.go('/volunteer/matches'),
             child: _buildNavItem(
               icon: Icons.people,
               label: 'Matches',
@@ -698,9 +695,7 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/rewards');
-            },
+            onTap: () => context.go('/volunteer/rewards'),
             child: _buildNavItem(
               icon: Icons.card_giftcard,
               label: 'Recompensas',

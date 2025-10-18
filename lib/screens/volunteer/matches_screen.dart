@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
-import 'package:vinculo/screens/volunteer/contact_profile_screen.dart';
 
 class MatchesScreen extends ConsumerWidget {
   const MatchesScreen({super.key});
@@ -319,11 +319,9 @@ class MatchesScreen extends ConsumerWidget {
   }
 
   void _viewProfile(BuildContext context, Map<String, dynamic> match) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ContactProfileScreen(contact: match),
-      ),
+    // Navegar usando go_router con parámetros en la ruta
+    context.go(
+      '/volunteer/matches/profile/${match['id'] ?? match['name']}?name=${match['name']}&bio=${match['availability']}',
     );
   }
 
@@ -352,7 +350,7 @@ class MatchesScreen extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => context.pop(),
             child: Text(
               'Cancelar',
               style: TextStyle(
@@ -365,7 +363,7 @@ class MatchesScreen extends ConsumerWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              context.pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Iniciando llamada con ${match['name']}...'),
@@ -414,7 +412,7 @@ class MatchesScreen extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => context.pop(),
             child: const Text(
               'Cerrar',
               style: TextStyle(
@@ -454,9 +452,7 @@ class MatchesScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           GestureDetector(
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/volunteer_home');
-            },
+            onTap: () => context.go('/volunteer/home'),
             child: _buildNavItem(
               icon: Icons.home,
               label: 'Inicio',
@@ -474,9 +470,7 @@ class MatchesScreen extends ConsumerWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/rewards');
-            },
+            onTap: () => context.go('/volunteer/rewards'),
             child: _buildNavItem(
               icon: Icons.card_giftcard,
               label: 'Recompensas',
@@ -485,9 +479,7 @@ class MatchesScreen extends ConsumerWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/profile');
-            },
+            onTap: () => context.go('/volunteer/profile'),
             child: _buildNavItem(
               icon: Icons.person,
               label: 'Perfil',
@@ -539,6 +531,7 @@ class MatchesScreen extends ConsumerWidget {
   List<Map<String, dynamic>> _getMatchesData() {
     return [
       {
+        'id': 'sofia_78',
         'name': 'Sofía',
         'age': 78,
         'location': 'Madrid',
@@ -547,6 +540,7 @@ class MatchesScreen extends ConsumerWidget {
         'availability': 'Lunes y Miércoles por la tarde',
       },
       {
+        'id': 'carlos_82',
         'name': 'Carlos',
         'age': 82,
         'location': 'Barcelona',
@@ -555,6 +549,7 @@ class MatchesScreen extends ConsumerWidget {
         'availability': 'Fines de semana',
       },
       {
+        'id': 'elena_75',
         'name': 'Elena',
         'age': 75,
         'location': 'Valencia',

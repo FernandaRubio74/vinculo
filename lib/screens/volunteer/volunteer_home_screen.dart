@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart'; // ← NUEVO IMPORT
 import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
 
@@ -30,7 +31,7 @@ class VolunteerHomeScreen extends ConsumerWidget {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/settings');
+              context.push('/settings'); // ← CAMBIO 1
             },
             icon: Icon(
               Icons.settings,
@@ -188,7 +189,7 @@ class VolunteerHomeScreen extends ConsumerWidget {
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: () {
-          Navigator.pushNamed(context, '/matches');
+          context.push('/volunteer/matches'); // ← CAMBIO 2
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppConstants.primaryColor,
@@ -487,7 +488,7 @@ class VolunteerHomeScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           GestureDetector(
-            onTap: () {},
+            onTap: () {}, // Ya estamos en home
             child: _buildNavItem(
               icon: Icons.home,
               label: 'Inicio',
@@ -497,7 +498,7 @@ class VolunteerHomeScreen extends ConsumerWidget {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, '/matches');
+              context.push('/volunteer/matches'); // ← CAMBIO 3
             },
             child: _buildNavItem(
               icon: Icons.people,
@@ -508,7 +509,7 @@ class VolunteerHomeScreen extends ConsumerWidget {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, '/rewards');
+              context.push('/volunteer/rewards'); // ← CAMBIO 4
             },
             child: _buildNavItem(
               icon: Icons.card_giftcard,
@@ -519,7 +520,7 @@ class VolunteerHomeScreen extends ConsumerWidget {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.pushReplacementNamed(context, '/profile');
+              context.push('/volunteer/profile'); // ← CAMBIO 5
             },
             child: _buildNavItem(
               icon: Icons.person,
