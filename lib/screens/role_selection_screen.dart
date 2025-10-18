@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart'; // ← NUEVO IMPORT
 import 'package:vinculo/utils/constants.dart';
 import 'package:vinculo/widgets/custom_header.dart';
 
@@ -205,9 +206,9 @@ class RoleSelectionScreen extends StatelessWidget {
 
   void _selectRole(BuildContext context, String role) {
     if (role == 'senior') {
-      Navigator.pushNamed(context, '/register_elderly');
+      context.push('/elderly/register'); // ← CAMBIO 1
     } else if (role == 'volunteer') {
-      Navigator.pushNamed(context, '/register_volunteer');
+      context.push('/volunteer/register'); // ← CAMBIO 2
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -242,7 +243,7 @@ class RoleSelectionScreen extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => context.pop(), // ← CAMBIO 3
               child: const Text(
                 'Entendido',
                 style: TextStyle(

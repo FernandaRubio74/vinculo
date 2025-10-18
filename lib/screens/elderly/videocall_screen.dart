@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vinculo/utils/constants.dart';
 
 class VideoCallScreen extends StatefulWidget {
@@ -234,17 +235,17 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                     _buildNavItem(
                       icon: Icons.home,
                       label: 'Inicio',
-                      onTap: () => _exitCall('/home_elderly'),
+                      onTap: () => _exitCall('/elderly/home'),
                     ),
                     _buildNavItem(
                       icon: Icons.person,
                       label: 'Perfil',
-                      onTap: () => _exitCall('/profile_elderly'),
+                      onTap: () => _exitCall('/elderly/profile'),
                     ),
                     _buildNavItem(
                       icon: Icons.local_activity,
                       label: 'Actividades',
-                      onTap: () => _exitCall('/activities_elderly'),
+                      onTap: () => _exitCall('/elderly/activities'),
                     ),
                   ],
                 ),
@@ -361,7 +362,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => context.pop(),
             child: const Text(
               'Cancelar',
               style: TextStyle(
@@ -372,8 +373,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Cerrar dialog
-              Navigator.of(context).pop(); // Volver a la pantalla anterior
+              context.pop(); // Cerrar dialog
+              context.pop(); // Volver a la pantalla anterior
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppConstants.accentColorLight,
@@ -416,7 +417,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => context.pop(),
             child: const Text(
               'Cancelar',
               style: TextStyle(
@@ -427,8 +428,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Cerrar dialog
-              Navigator.pushReplacementNamed(context, route);
+              context.pop(); // Cerrar dialog
+              context.go(route);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppConstants.primaryColor,

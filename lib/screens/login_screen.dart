@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vinculo/config/providers/auth_provider.dart';
 import 'package:vinculo/utils/constants.dart';
@@ -200,13 +201,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   textColor: AppConstants.backgroundColor,
                                 ),
 
-                              const SizedBox(height: AppConstants.defaultPadding),
+                              const SizedBox(
+                                height: AppConstants.defaultPadding,
+                              ),
 
                               // Botón de registro
                               CustomButton(
                                 text: 'Registro',
                                 onPressed: () {
-                                  Navigator.pushNamed(context, '/registro');
+                                  context.push('/registro'); // ← CAMBIO AQUÍ
                                 },
                                 color: Colors.white,
                                 textColor: AppConstants.primaryColor,
@@ -263,10 +266,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       // Navegar según el tipo de usuario
       if (result.user!.type == UserType.elderly) {
         // Home para adulto mayor
-        Navigator.pushReplacementNamed(context, '/home_elderly');
+        context.go('/elderly/home'); 
       } else {
         // Home para voluntario
-        Navigator.pushReplacementNamed(context, '/volunteer_home');
+        context.go('/volunteer/home'); 
       }
     } else {
       _showError(result.errorMessage ?? 'Error al iniciar sesión');

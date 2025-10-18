@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart'; // ← NUEVO IMPORT
 import 'package:vinculo/utils/constants.dart';
 
 class RegistrationSuccessScreen extends StatelessWidget {
@@ -17,7 +18,7 @@ class RegistrationSuccessScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(), // ← CAMBIO 1
           icon: const Icon(
             Icons.arrow_back,
             color: AppConstants.textColor,
@@ -152,18 +153,9 @@ class RegistrationSuccessScreen extends StatelessWidget {
   void _goToHome(BuildContext context) {
     // Navegar al inicio según el tipo de usuario y limpiar el stack de navegación
     if (userType == 'volunteer') {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/volunteer_home',
-        (route) => false,
-      );
+      context.go('/volunteer/home'); // ← CAMBIO 2
     } else {
-      // Para adultos mayores, navegamos a su pantalla de inicio (cuando la crees)
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/elderly_home', // Deberás crear esta ruta más adelante
-        (route) => false,
-      );
+      context.go('/elderly/home'); // ← CAMBIO 3
     }
   }
 }

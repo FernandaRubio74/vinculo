@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart'; // ← NUEVO IMPORT
 import '../utils/constants.dart';
-import '../widgets/custom_button.dart'; // Import the CustomButton widget
+import '../widgets/custom_button.dart';
 
 class LandingPage extends StatelessWidget {
   const LandingPage({Key? key}) : super(key: key);
@@ -73,100 +74,100 @@ class WelcomeScreen extends StatelessWidget {
           ),
           
           // Contenido principal
-            SafeArea(
+          SafeArea(
             child: Column(
               children: [
-              Expanded(
-                child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.largePadding),
-                  child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Icono
-                    Container(
-                    width: 96,
-                    height: 96,
-                    decoration: BoxDecoration(
-                      color: AppConstants.primaryColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(AppConstants.largePadding),
-                      boxShadow: [
-                      BoxShadow(
-                        color: AppConstants.secondaryColor.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
+                Expanded(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppConstants.largePadding),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Icono
+                          Container(
+                            width: 96,
+                            height: 96,
+                            decoration: BoxDecoration(
+                              color: AppConstants.primaryColor.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(AppConstants.largePadding),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppConstants.secondaryColor.withOpacity(0.1),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.favorite,
+                              size: 48,
+                              color: AppConstants.primaryColor,
+                            ),
+                          ),
+                          
+                          const SizedBox(height: AppConstants.largePadding),
+                          
+                          // Título
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.textColor,
+                                fontFamily: 'Public Sans',
+                              ),
+                              children: [
+                                TextSpan(text: '${AppConstants.welcomeMessage}\nBienvenido a '),
+                                TextSpan(
+                                  text: AppConstants.appName,
+                                  style: const TextStyle(color: AppConstants.primaryColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                          
+                          const SizedBox(height: AppConstants.defaultPadding),
+                          
+                          // Descripción
+                          SizedBox(
+                            width: 320,
+                            child: Text(
+                              'Tu espacio para conectar y compartir momentos con quienes más quieres.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: AppConstants.textColor.withOpacity(0.7),
+                                height: 1.5,
+                                fontFamily: 'Public Sans',
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      ],
                     ),
-                    child: Icon(
-                      Icons.favorite,
-                      size: 48,
-                      color: AppConstants.primaryColor,
-                    ),
-                    ),
-                    
-                    const SizedBox(height: AppConstants.largePadding),
-                    
-                    // Título
-                    RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                      style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: AppConstants.textColor,
-                      fontFamily: 'Public Sans',
-                      ),
-                      children: [
-                      TextSpan(text: '${AppConstants.welcomeMessage}\nBienvenido a '),
-                      TextSpan(
-                        text: AppConstants.appName,
-                        style: const TextStyle(color: AppConstants.primaryColor),
-                      ),
-                      ],
-                    ),
-                    ),
-                    
-                    const SizedBox(height: AppConstants.defaultPadding),
-                    
-                    // Descripción
-                    SizedBox(
-                    width: 320,
-                    child: Text(
-                      'Tu espacio para conectar y compartir momentos con quienes más quieres.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                      fontSize: 18,
-                      color: AppConstants.textColor.withOpacity(0.7),
-                      height: 1.5,
-                      fontFamily: 'Public Sans',
-                      ),
-                    ),
-                    ),
-                  ],
                   ),
                 ),
+                
+                // Botón personalizado
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppConstants.largePadding, 
+                    0, 
+                    AppConstants.largePadding, 
+                    48
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: CustomButton(
+                      text: 'Comenzar',
+                      onPressed: () {
+                        context.push('/login'); // ← CAMBIO AQUÍ
+                      },
+                    ),
+                  ),
                 ),
-              ),
-              
-              // Botón personalizado
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                AppConstants.largePadding, 
-                0, 
-                AppConstants.largePadding, 
-                48
-                ),
-                child: SizedBox(
-                width: double.infinity,
-                child: CustomButton(
-                  text: 'Comenzar',
-                  onPressed: () {
-                  Navigator.pushNamed(context, '/login');
-                  },
-                ),
-                ),
-              ),
               ],
             ),
           ),
