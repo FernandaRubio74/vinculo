@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart'; // ← NUEVO IMPORT
 import 'package:vinculo/utils/constants.dart';
-import 'package:vinculo/screens/registration_success_screen.dart';
 
 class RegisterVolunteerScreen extends StatefulWidget {
   const RegisterVolunteerScreen({super.key});
@@ -72,7 +72,7 @@ class _RegisterVolunteerScreenState extends State<RegisterVolunteerScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(), // ← CAMBIO 1
           icon: const Icon(
             Icons.arrow_back,
             color: AppConstants.textColor,
@@ -503,12 +503,12 @@ class _RegisterVolunteerScreenState extends State<RegisterVolunteerScreen> {
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(
+            children: const [
+              CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(AppConstants.primaryColor),
               ),
-              const SizedBox(height: 16),
-              const Text(
+              SizedBox(height: 16),
+              Text(
                 'Guardando tu perfil...',
                 style: TextStyle(
                   fontSize: 16,
@@ -524,15 +524,10 @@ class _RegisterVolunteerScreenState extends State<RegisterVolunteerScreen> {
 
     // Simular tiempo de guardado (2 segundos)
     Future.delayed(const Duration(seconds: 2), () {
-      Navigator.of(context).pop(); // Cerrar loading dialog
+      context.pop(); // ← CAMBIO 2 (cerrar loading dialog)
       
       // Navegar a pantalla de éxito
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const RegistrationSuccessScreen(userType: 'volunteer'),
-        ),
-      );
+      context.push('/success?userType=volunteer'); // ← CAMBIO 3
     });
   }
 

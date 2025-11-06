@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vinculo/utils/constants.dart';
 
 class HomeElderlyScreen extends StatefulWidget {
@@ -487,14 +488,14 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
                 icon: Icons.person_outline,
                 label: 'Perfil',
                 isActive: false,
-                onTap: () => Navigator.pushNamed(context, '/profile_elderly'),
+                onTap: () => context.go('/elderly/profile'),
               ),
               _buildNavItem(
                 context: context,
                 icon: Icons.local_activity,
                 label: 'Actividades',
                 isActive: false,
-                onTap: () => Navigator.pushNamed(context, '/activities_elderly'),
+                onTap: () => context.go('/elderly/activities'),
               ),
             ],
           ),
@@ -583,7 +584,7 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => context.pop(),
             child: Text(
               'Cancelar',
               style: TextStyle(
@@ -596,8 +597,8 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.pushNamed(context, '/videocall');
+              context.pop();
+              context.go('/elderly/videocall?contact=${person.name}');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppConstants.primaryColor,
@@ -617,7 +618,7 @@ class _HomeScreenState extends State<HomeElderlyScreen> {
   }
 
   void _exploreActivities() {
-    Navigator.pushNamed(context, '/activities_elderly');
+    context.go('/elderly/activities');
   }
 }
 

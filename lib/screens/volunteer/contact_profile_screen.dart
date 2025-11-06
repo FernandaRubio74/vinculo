@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
 
@@ -23,7 +24,7 @@ class ContactProfileScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
           icon: Icon(
             Icons.arrow_back,
             color: isDark ? AppConstants.hintColor : AppConstants.textColor,
@@ -328,7 +329,7 @@ class ContactProfileScreen extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => context.pop(),
             child: Text(
               'Cancelar',
               style: TextStyle(
@@ -341,7 +342,7 @@ class ContactProfileScreen extends ConsumerWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              context.pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
@@ -401,9 +402,7 @@ class ContactProfileScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           GestureDetector(
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/volunteer_home');
-            },
+            onTap: () => context.go('/volunteer/home'),
             child: _buildNavItem(
               icon: Icons.home,
               label: 'Inicio',
@@ -412,9 +411,7 @@ class ContactProfileScreen extends ConsumerWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/matches');
-            },
+            onTap: () => context.go('/volunteer/matches'),
             child: _buildNavItem(
               icon: Icons.people,
               label: 'Matches',
@@ -423,9 +420,7 @@ class ContactProfileScreen extends ConsumerWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/rewards');
-            },
+            onTap: () => context.go('/volunteer/rewards'),
             child: _buildNavItem(
               icon: Icons.card_giftcard,
               label: 'Recompensas',
@@ -434,9 +429,7 @@ class ContactProfileScreen extends ConsumerWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/profile');
-            },
+            onTap: () => context.go('/volunteer/profile'),
             child: _buildNavItem(
               icon: Icons.person,
               label: 'Perfil',
