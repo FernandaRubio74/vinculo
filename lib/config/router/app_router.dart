@@ -64,6 +64,5 @@ class AppRoutes {
     activitiesElderly: (context) => const ActivitiesScreen(),
     profileElderly: (context) => const ProfileElderlyScreen(),
     volunteers: (context) => const VolunteersScreen(),
-    // Agrega más rutas aquí
   };
 }
