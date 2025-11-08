@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart'; // ← NUEVO IMPORT
+import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vinculo/utils/constants.dart';
 import 'package:vinculo/widgets/custom_header.dart';
 import 'package:vinculo/widgets/custom_text_field.dart';
+import 'package:vinculo/config/providers/auth_provider.dart'; 
 
-class RegisterGeneralScreen extends StatefulWidget {
+
+class RegisterGeneralScreen extends ConsumerStatefulWidget {
   const RegisterGeneralScreen({super.key});
 
   @override
-  State<RegisterGeneralScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterGeneralScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterGeneralScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterGeneralScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   @override
   void dispose() {
@@ -29,14 +31,15 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+    final isLoading = authState == AuthState.loading;
+
     return Scaffold(
       backgroundColor: AppConstants.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            // Header con botón de retroceso
             const CustomHeader(showBack: true),
-            // Contenido principal scrollable
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(
@@ -45,14 +48,10 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
                 child: Column(
                   children: [
                     const SizedBox(height: AppConstants.smallPadding),
-
-                    // Icono y título
                     Column(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(
-                            AppConstants.defaultPadding,
-                          ),
+                          padding: const EdgeInsets.all(AppConstants.defaultPadding),
                           decoration: BoxDecoration(
                             color: AppConstants.primaryColor.withOpacity(0.1),
                             shape: BoxShape.circle,
@@ -65,7 +64,7 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
                         ),
                         const SizedBox(height: AppConstants.defaultPadding),
                         const Text(
-                          'Crea tu cuenta',
+                          'Crea tu cuenta (Paso 1/2)',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -75,7 +74,7 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
                         ),
                         const SizedBox(height: AppConstants.smallPadding),
                         Text(
-                          'Únete a nuestra comunidad para conectar con tus seres queridos.',
+                          'Ingresa tus datos básicos para iniciar.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
@@ -85,42 +84,31 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 32),
-
-                    // Formulario
+ 
                     Column(
                       children: [
-                        // Campo Nombre
                         CustomTextField(
                           controller: _nameController,
-                          hintText: 'Nombre completo',
+                          hintText: 'Nombre completo (ej. Carlos Ramírez)',
                           keyboardType: TextInputType.name,
                           prefixIcon: Icons.person_outline,
                         ),
-
                         const SizedBox(height: 20),
-
-                        // Campo Email
                         CustomTextField(
                           controller: _emailController,
-                          hintText: 'Correo electrónico',
+                          hintText: 'Correo (ej. carlos@ejemplo.com)',
                           keyboardType: TextInputType.emailAddress,
                           prefixIcon: Icons.email_outlined,
                         ),
-
                         const SizedBox(height: 20),
-
-                        // Campo Contraseña
                         CustomTextField(
                           controller: _passwordController,
-                          hintText: 'Crea una contraseña',
+                          hintText: 'Contraseña (ej. Password123!)',
                           obscureText: true,
                           prefixIcon: Icons.lock_outline,
                         ),
-
                         const SizedBox(height: 20),
-
                         CustomTextField(
                           controller: _confirmPasswordController,
                           hintText: 'Confirma tu contraseña',
@@ -129,40 +117,40 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 40),
 
-                    // Botón de registro
                     SizedBox(
                       width: double.infinity,
                       height: 64,
-                      child: ElevatedButton(
-                        onPressed: _handleRegister,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppConstants.primaryColor,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 8,
-                          shadowColor: AppConstants.primaryColor.withOpacity(
-                            0.39,
-                          ),
-                        ),
-                        child: const Text(
-                          'Siguiente',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Public Sans',
-                          ),
-                        ),
-                      ),
+                      child: isLoading
+                          ? const Center(
+                              child: CircularProgressIndicator(
+                                color: AppConstants.primaryColor,
+                              ),
+                            )
+                          : ElevatedButton(
+                              onPressed: _handleNext,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppConstants.primaryColor,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 8,
+                                shadowColor: AppConstants.primaryColor.withOpacity(0.39),
+                              ),
+                              child: const Text(
+                                'Siguiente',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Public Sans',
+                                ),
+                              ),
+                            ),
                     ),
-
                     const SizedBox(height: AppConstants.largePadding),
-
-                    // Link para iniciar sesión
+ 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -175,7 +163,7 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
                           ),
                         ),
                         TextButton(
-                          onPressed: () => context.pop(), // ← CAMBIO 1
+                          onPressed: () => context.goNamed('login'), 
                           child: const Text(
                             'Inicia sesión',
                             style: TextStyle(
@@ -192,93 +180,52 @@ class _RegisterScreenState extends State<RegisterGeneralScreen> {
                 ),
               ),
             ),
-
-            // Bottom Navigation
-            Container(
-              decoration: BoxDecoration(
-                color: AppConstants.backgroundColor,
-                border: Border(
-                  top: BorderSide(color: Colors.grey.shade200, width: 1),
-                ),
-              ),
-              child: SafeArea(
-                top: false,
-                child: Container(
-                  height: 80,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppConstants.defaultPadding,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildNavItem(
-                        icon: Icons.home,
-                        label: 'Inicio',
-                        isActive: false,
-                      ),
-                      _buildNavItem(
-                        icon: Icons.person,
-                        label: 'Perfil',
-                        isActive: true,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildNavItem({
-    required IconData icon,
-    required String label,
-    required bool isActive,
-  }) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          icon,
-          color: isActive
-              ? AppConstants.primaryColor
-              : AppConstants.textColor.withOpacity(0.5),
-          size: 24,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: isActive
-                ? AppConstants.primaryColor
-                : AppConstants.textColor.withOpacity(0.5),
-            fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-            fontFamily: 'Public Sans',
-          ),
-        ),
-      ],
-    );
-  }
+  void _handleNext() {
 
-  void _handleRegister() {
-    // Validación de campos
-    if (_nameController.text.isEmpty ||
-        _emailController.text.isEmpty ||
+    if (_nameController.text.trim().isEmpty ||
+        _emailController.text.trim().isEmpty ||
         _passwordController.text.isEmpty ||
         _confirmPasswordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor completa todos los campos'),
-          backgroundColor: AppConstants.accentColorLight,
-        ),
-      );
+      _showError('Por favor completa todos los campos');
       return;
     }
-    
-    // Navegar a la siguiente pantalla (selección de rol)
-    context.go('/roles'); // ← CAMBIO 2
+    if (!_emailController.text.contains('@')) {
+      _showError('Ingresa un correo electrónico válido');
+      return;
+    }
+    if (_passwordController.text.length < 6) {
+      _showError('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+    if (_passwordController.text != _confirmPasswordController.text) {
+      _showError('Las contraseñas no coinciden');
+      return;
+    }
+
+
+    ref.read(registerDataProvider.notifier).state = {
+
+      'name': _nameController.text.trim(),
+      'email': _emailController.text.trim(),
+      'password': _passwordController.text,
+    };
+
+
+    context.pushNamed('roles'); 
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppConstants.accentColorLight,
+      ),
+    );
   }
 }
