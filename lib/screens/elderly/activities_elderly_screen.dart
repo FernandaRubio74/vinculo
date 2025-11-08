@@ -1,56 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vinculo/utils/constants.dart';
+import 'package:vinculo/config/providers/presentation/theme_provider.dart';
+import 'package:vinculo/models/user_model.dart';
+import 'package:vinculo/config/providers/active_connections_provider.dart';
 
-class ActivitiesScreen extends StatefulWidget {
+class ActivitiesScreen extends ConsumerWidget {
   const ActivitiesScreen({super.key});
 
   @override
-  State<ActivitiesScreen> createState() => _ActivitiesScreenState();
-}
-
-class _ActivitiesScreenState extends State<ActivitiesScreen> {
-  final List<ActivityOption> _activities = [
-    ActivityOption(
-      title: 'Videollamada',
-      icon: Icons.videocam,
-      onTap: () {},
-    ),
-    ActivityOption(
-      title: 'Conversar',
-      icon: Icons.chat,
-      onTap: () {},
-    ),
-    ActivityOption(
-      title: 'Aprender',
-      icon: Icons.school,
-      onTap: () {},
-    ),
-    ActivityOption(
-      title: 'Narrar Historias',
-      icon: Icons.auto_stories,
-      onTap: () {},
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = ref.watch(themeNotifierProvider).isDarkMode;
+    final activeConnections = ref.watch(activeConnectionsProvider);
 
     return Scaffold(
       backgroundColor: isDark
-          ? AppConstants.backgroundDark // Usa tu constante
+          ? AppConstants.backgroundDark
           : AppConstants.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            // Header
             Padding(
               padding: const EdgeInsets.all(AppConstants.defaultPadding),
               child: Row(
                 children: [
                   const SizedBox(width: 48),
-                  Expanded(
+                  const Expanded(
                     child: Text(
                       AppConstants.appName,
                       textAlign: TextAlign.center,
@@ -66,9 +42,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                     onPressed: () => context.go('/settings'),
                     icon: Icon(
                       Icons.settings,
-                      color: isDark
-                          ? AppConstants.backgroundColor.withOpacity(0.8)
-                          : AppConstants.backgroundDark.withOpacity(0.8),
+                      color: isDark ? AppConstants.hintColor : AppConstants.textColor,
                       size: 30,
                     ),
                   ),
@@ -85,10 +59,8 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                 child: Column(
                   children: [
                     const SizedBox(height: AppConstants.largePadding),
-
-                    // Título principal
                     Text(
-                      'Actividades de Hoy',
+                      'Tus Conexiones', 
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -99,27 +71,51 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                       ),
                       textAlign: TextAlign.center,
                     ),
-
+                    const SizedBox(height: 12),
+                    Text(
+                      'Inicia una videollamada o chat con tus amigos.', 
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: isDark ? AppConstants.hintColor : Colors.grey.shade700,
+                        fontFamily: 'Public Sans',
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                     const SizedBox(height: 48),
 
-                    // Grid de actividades
+
                     Expanded(
-                      child: GridView.builder(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: AppConstants.largePadding,
-                          mainAxisSpacing: AppConstants.largePadding,
-                          childAspectRatio: 1.0,
+                      child: activeConnections.when(
+                        loading: () => const Center(
+                          child: CircularProgressIndicator(color: AppConstants.primaryColor),
                         ),
-                        itemCount: _activities.length,
-                        itemBuilder: (context, index) {
-                          final activity = _activities[index];
-                          return _buildActivityCard(context, activity, isDark);
+                        error: (err, stack) => Center(
+                          child: Text('Error al cargar conexiones: ${err.toString()}'),
+                        ),
+                        data: (connections) {
+                          if (connections.isEmpty) {
+                            return Center(
+                              child: Text(
+                                'Aún no tienes conexiones.\n¡Ve a Inicio para encontrar voluntarios!',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            );
+                          }
+
+                          return ListView.builder(
+                            itemCount: connections.length,
+                            itemBuilder: (context, index) {
+                              final user = connections[index];
+                              return _buildConnectionCard(context, user, isDark);
+                            },
+                          );
                         },
                       ),
                     ),
-
-                    const SizedBox(height: 100),
                   ],
                 ),
               ),
@@ -127,129 +123,129 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
           ],
         ),
       ),
-
-      bottomNavigationBar: _buildBottomNavigation(context),
+      bottomNavigationBar: _buildBottomNavigation(context, isDark),
     );
   }
 
-  Widget _buildActivityCard(BuildContext context, ActivityOption activity, bool isDark) {
-    return GestureDetector(
-      onTap: () => _handleActivityTap(context, activity),
-      child: Container(
-        decoration: BoxDecoration(
-          color: isDark
-              ? AppConstants.backgroundDark.withOpacity(0.5)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: isDark
-                  ? Colors.black.withOpacity(0.2)
-                  : Colors.black.withOpacity(0.05),
-              blurRadius: isDark ? 12 : 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+ 
+  Widget _buildConnectionCard(BuildContext context, UserModel user, bool isDark) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: AppConstants.defaultPadding),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: isDark ? AppConstants.backgroundDark.withOpacity(0.8) : Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(AppConstants.defaultPadding),
+        child: Row(
           children: [
-            // Icono
+            // Avatar
             Container(
-              width: 80,
-              height: 80,
+              width: 60,
+              height: 60,
               decoration: BoxDecoration(
-                color: AppConstants.primaryColor.withOpacity(0.1),
                 shape: BoxShape.circle,
+                color: AppConstants.primaryColor.withOpacity(0.2),
               ),
-              child: Icon(
-                activity.icon,
-                size: 40,
-                color: AppConstants.primaryColor,
-              ),
+              child: const Icon(Icons.person, size: 30, color: AppConstants.primaryColor),
             ),
-            const SizedBox(height: AppConstants.defaultPadding),
-            // Título
-            Text(
-              activity.title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: isDark
-                    ? AppConstants.backgroundColor
-                    : AppConstants.backgroundDark,
-                fontFamily: 'Public Sans',
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavigation(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppConstants.backgroundDark.withOpacity(0.5)
-            : Colors.white,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withOpacity(0.2)
-                : Colors.black.withOpacity(0.05),
-            blurRadius: 30,
-            offset: const Offset(0, -10),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              height: 70,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppConstants.defaultPadding,
-                vertical: 8,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+            const SizedBox(width: AppConstants.defaultPadding),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildNavItem(
-                    context: context,
-                    icon: Icons.home,
-                    label: 'Inicio',
-                    isActive: false,
-                    onTap: () => context.go('/elderly/home'),
+                  Text(
+                    user.fullName,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black,
+                      fontFamily: 'Public Sans',
+                    ),
                   ),
-                  _buildNavItem(
-                    context: context,
-                    icon: Icons.person,
-                    label: 'Perfil',
-                    isActive: false,
-                    onTap: () => context.go('/elderly/profile'),
-                  ),
-                  _buildNavItem(
-                    context: context,
-                    icon: Icons.local_activity,
-                    label: 'Actividades',
-                    isActive: true,
-                    onTap: () {},
+                  Text(
+                    user.bio ?? 'Conectado',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDark ? AppConstants.hintColor : Colors.grey.shade700,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(width: 8),
+
+            // Botón de Videollamada
+            IconButton(
+              onPressed: () {
+                context.pushNamed(
+                  'videocall', 
+                  queryParameters: {'contact': user.fullName}
+                );
+              },
+              icon: const Icon(Icons.videocam, color: AppConstants.primaryColor, size: 30),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+ 
+  Widget _buildBottomNavigation(BuildContext context, bool isDark) {
+     return Container(
+      decoration: BoxDecoration(
+        color: (isDark
+                ? AppConstants.backgroundDark
+                : AppConstants.backgroundColor)
+            .withOpacity(0.95),
+        border: Border(
+          top: BorderSide(
+            color: isDark
+                ? Colors.grey.shade700.withOpacity(0.5)
+                : Colors.grey.shade200,
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Container(
+          height: 70,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppConstants.defaultPadding,
+            vertical: 8,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(
+                context: context,
+                icon: Icons.home,
+                label: 'Inicio',
+                isActive: false,
+                isDark: isDark,
+                onTap: () => context.goNamed('elderly-home'),
+              ),
+              _buildNavItem(
+                context: context,
+                icon: Icons.person_outline,
+                label: 'Perfil',
+                isActive: false,
+                isDark: isDark,
+                onTap: () => context.goNamed('elderly-profile'),
+              ),
+              _buildNavItem(
+                context: context,
+                icon: Icons.local_activity,
+                label: 'Actividades',
+                isActive: true,
+                isDark: isDark,
+                onTap: () {},
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -260,10 +256,9 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
     required IconData icon,
     required String label,
     required bool isActive,
+    required bool isDark,
     required VoidCallback onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -274,8 +269,8 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
             color: isActive
                 ? AppConstants.primaryColor
                 : (isDark
-                    ? AppConstants.backgroundColor.withOpacity(0.5)
-                    : AppConstants.backgroundDark.withOpacity(0.5)),
+                    ? AppConstants.hintColor.withOpacity(0.5)
+                    : AppConstants.textColor.withOpacity(0.5)),
             size: 24,
           ),
           const SizedBox(height: 4),
@@ -286,8 +281,8 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
               color: isActive
                   ? AppConstants.primaryColor
                   : (isDark
-                      ? AppConstants.backgroundColor.withOpacity(0.5)
-                      : AppConstants.backgroundDark.withOpacity(0.5)),
+                      ? AppConstants.hintColor.withOpacity(0.5)
+                      : AppConstants.textColor.withOpacity(0.5)),
               fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
               fontFamily: 'Public Sans',
             ),
@@ -296,30 +291,4 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
       ),
     );
   }
-
-  void _handleActivityTap(BuildContext context, ActivityOption activity) {
-    if (activity.title == 'Videollamada') {
-      context.go('/elderly/activities/volunteers');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Iniciando ${activity.title}...'),
-          backgroundColor: AppConstants.primaryColor,
-        ),
-      );
-    }
-  }
-}
-
-// Clase para representar una opción de actividad
-class ActivityOption {
-  final String title;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  ActivityOption({
-    required this.title,
-    required this.icon,
-    required this.onTap,
-  });
 }

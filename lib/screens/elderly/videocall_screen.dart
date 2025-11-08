@@ -8,7 +8,7 @@ class VideoCallScreen extends StatefulWidget {
   
   const VideoCallScreen({
     super.key,
-    this.contactName = 'Ana López',
+    this.contactName = 'Ana López', 
   });
 
   @override
@@ -16,6 +16,7 @@ class VideoCallScreen extends StatefulWidget {
 }
 
 class _VideoCallScreenState extends State<VideoCallScreen> {
+
   bool _isMuted = false;
   bool _isVideoOff = false;
   bool _showControls = true;
@@ -23,13 +24,11 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   @override
   void initState() {
     super.initState();
-    // Ocultar la barra de estado
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
   }
 
   @override
   void dispose() {
-    // Restaurar la barra de estado
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
@@ -40,26 +39,33 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       backgroundColor: const Color(0xFF101c22),
       body: Stack(
         children: [
-          // Video de fondo principal (simulado con gradiente)
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  AppConstants.primaryColor.withOpacity(0.3),
-                  const Color(0xFF101c22),
-                  AppConstants.secondaryColor.withOpacity(0.5),
-                ],
+          // simulando una videollamada
+          GestureDetector(
+             onTap: () {
+              setState(() {
+                _showControls = !_showControls;
+              });
+            },
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    AppConstants.primaryColor.withOpacity(0.3),
+                    const Color(0xFF101c22),
+                    AppConstants.secondaryColor.withOpacity(0.5),
+                  ],
+                ),
               ),
-            ),
-            child: Center(
-              child: Icon(
-                Icons.person,
-                size: 200,
-                color: Colors.white.withOpacity(0.3),
+              child: Center(
+                child: Icon(
+                  Icons.person,
+                  size: 200,
+                  color: Colors.white.withOpacity(0.3),
+                ),
               ),
             ),
           ),
@@ -80,50 +86,44 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
             ),
           ),
           
-          // Video propio (esquina superior derecha)
+
           Positioned(
             top: 60,
             right: 16,
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _showControls = !_showControls;
-                });
-              },
-              child: Container(
-                width: 120,
-                height: 160,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.5),
-                    width: 2,
-                  ),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppConstants.primaryColor.withOpacity(0.6),
-                      AppConstants.secondaryColor.withOpacity(0.8),
-                    ],
-                  ),
+            child: Container(
+              width: 120,
+              height: 160,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.5),
+                  width: 2,
                 ),
-                child: _isVideoOff
-                    ? const Icon(
-                        Icons.videocam_off,
-                        color: Colors.white,
-                        size: 40,
-                      )
-                    : const Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 60,
-                      ),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppConstants.primaryColor.withOpacity(0.6),
+                    AppConstants.secondaryColor.withOpacity(0.8),
+                  ],
+                ),
               ),
+
+              child: _isVideoOff
+                  ? const Icon(
+                      Icons.videocam_off,
+                      color: Colors.white,
+                      size: 40,
+                    )
+                  : const Icon(
+                      Icons.person,
+                      color: Colors.white,
+                      size: 60,
+                    ),
             ),
           ),
           
-          // Controles de video (parte inferior)
+
           if (_showControls)
             Positioned(
               bottom: 120,
@@ -136,11 +136,13 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Botón silenciar
+
                     _buildControlButton(
+
                       icon: _isMuted ? Icons.mic_off : Icons.mic,
                       label: _isMuted ? 'Activar' : 'Silenciar',
                       onPressed: () {
+
                         setState(() {
                           _isMuted = !_isMuted;
                         });
@@ -149,11 +151,13 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       isActive: _isMuted,
                     ),
                     
-                    // Botón video
+
                     _buildControlButton(
+
                       icon: _isVideoOff ? Icons.videocam_off : Icons.videocam,
                       label: _isVideoOff ? 'Activar' : 'Detener',
                       onPressed: () {
+
                         setState(() {
                           _isVideoOff = !_isVideoOff;
                         });
@@ -162,11 +166,11 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       isActive: _isVideoOff,
                     ),
                     
-                    // Botón finalizar (más grande)
+
                     _buildControlButton(
                       icon: Icons.call_end,
                       label: 'Finalizar',
-                      onPressed: _endCall,
+                      onPressed: _endCall, 
                       isEndCall: true,
                     ),
                   ],
@@ -174,7 +178,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
               ),
             ),
             
-          // Información del contacto (parte superior)
+
           if (_showControls)
             Positioned(
               top: 60,
@@ -189,6 +193,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
+
                   'Llamando a ${widget.contactName}',
                   style: const TextStyle(
                     color: Colors.white,
@@ -202,7 +207,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         ],
       ),
       
-      // Bottom Navigation (semi-transparente)
+
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF101c22).withOpacity(0.8),
@@ -235,17 +240,17 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                     _buildNavItem(
                       icon: Icons.home,
                       label: 'Inicio',
-                      onTap: () => _exitCall('/elderly/home'),
+                      onTap: () => context.goNamed('elderly-home'),
                     ),
                     _buildNavItem(
                       icon: Icons.person,
                       label: 'Perfil',
-                      onTap: () => _exitCall('/elderly/profile'),
+                      onTap: () => context.goNamed('elderly-profile'),
                     ),
                     _buildNavItem(
                       icon: Icons.local_activity,
                       label: 'Actividades',
-                      onTap: () => _exitCall('/elderly/activities'),
+                      onTap: () => context.goNamed('activities-elderly'),
                     ),
                   ],
                 ),
@@ -277,13 +282,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
               shape: BoxShape.circle,
               color: isEndCall
                   ? AppConstants.accentColorLight
-                  : Colors.white.withOpacity(0.3),
-              border: isActive
-                  ? Border.all(
-                      color: AppConstants.primaryColor,
-                      width: 2,
-                    )
-                  : null,
+                  : (isActive ? AppConstants.primaryColor.withOpacity(0.6) : Colors.white.withOpacity(0.3)),
             ),
             child: Icon(
               icon,
@@ -305,6 +304,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       ),
     );
   }
+
 
   Widget _buildNavItem({
     required IconData icon,
@@ -336,6 +336,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     );
   }
 
+
   void _endCall() {
     HapticFeedback.mediumImpact();
     
@@ -362,7 +363,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => context.pop(),
+            onPressed: () => context.pop(), 
             child: const Text(
               'Cancelar',
               style: TextStyle(
@@ -373,8 +374,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              context.pop(); // Cerrar dialog
-              context.pop(); // Volver a la pantalla anterior
+              context.pop();
+              context.pop(); 
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppConstants.accentColorLight,
@@ -383,60 +384,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
               'Finalizar',
               style: TextStyle(
                 color: Colors.white,
-                fontFamily: 'Public Sans',
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _exitCall(String route) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        title: const Text(
-          'Salir de la llamada',
-          style: TextStyle(
-            fontFamily: 'Public Sans',
-            fontWeight: FontWeight.bold,
-            color: AppConstants.primaryColor,
-          ),
-        ),
-        content: const Text(
-          'Si navegas a otra pantalla, la llamada se mantendrá en segundo plano.',
-          style: TextStyle(
-            fontFamily: 'Public Sans',
-            fontSize: 16,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => context.pop(),
-            child: const Text(
-              'Cancelar',
-              style: TextStyle(
-                color: AppConstants.primaryColor,
-                fontFamily: 'Public Sans',
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              context.pop(); // Cerrar dialog
-              context.go(route);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppConstants.primaryColor,
-            ),
-            child: const Text(
-              'Continuar',
-              style: TextStyle(
                 fontFamily: 'Public Sans',
                 fontWeight: FontWeight.bold,
               ),

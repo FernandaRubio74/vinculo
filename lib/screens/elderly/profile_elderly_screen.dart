@@ -3,27 +3,48 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
+import 'package:vinculo/config/providers/auth_provider.dart';
 
-class ProfileElderlyScreen extends ConsumerStatefulWidget {
-  final String userName;
-  final int userAge;
-  final List<String> userInterests;
 
-  const ProfileElderlyScreen({
-    super.key,
-    this.userName = 'Elena Ramirez',
-    this.userAge = 78,
-    this.userInterests = const ['Jardinería', 'Lectura', 'Caminatas'],
-  });
+class ProfileElderlyScreen extends ConsumerWidget {
+  const ProfileElderlyScreen({super.key});
+
+  
+  int _calculateAge(String? birthDateString) {
+    if (birthDateString == null || birthDateString.isEmpty) {
+      return 0;
+    }
+    try {
+      final birthDate = DateTime.parse(birthDateString);
+      final today = DateTime.now();
+      int age = today.year - birthDate.year;
+      if (today.month < birthDate.month || 
+         (today.month == birthDate.month && today.day < birthDate.day)) {
+        age--;
+      }
+      return age;
+    } catch (e) {
+      return 0; 
+    }
+  }
 
   @override
-  ConsumerState<ProfileElderlyScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = ref.watch(themeNotifierProvider).isDarkMode;
+    final user = ref.watch(currentUserProvider);
+
+    
+    if (user == null) {
+      return Scaffold(
+        backgroundColor: isDark ? AppConstants.backgroundDark : AppConstants.backgroundColor,
+        body: const Center(
+          child: CircularProgressIndicator(color: AppConstants.primaryColor),
+        ),
+      );
+    }
+
+
+    final int userAge = _calculateAge(user.birthDate);
 
     return Scaffold(
       backgroundColor: isDark
@@ -48,7 +69,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
               ),
               child: Row(
                 children: [
-                  const SizedBox(width: 48), // Espacio para balance
+                  const SizedBox(width: 48), 
                   const Expanded(
                     child: Text(
                       AppConstants.appName,
@@ -62,7 +83,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => context.go('/settings'),
+                    onPressed: () => context.pushNamed('settings'), 
                     icon: Icon(
                       Icons.settings,
                       color: isDark
@@ -75,7 +96,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
               ),
             ),
 
-            // Contenido principal scrollable
+
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(AppConstants.largePadding),
@@ -86,7 +107,6 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
                     // Información del perfil
                     Column(
                       children: [
-                        // Foto de perfil
                         Container(
                           width: 128,
                           height: 128,
@@ -112,9 +132,9 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
 
                         const SizedBox(height: AppConstants.defaultPadding),
 
-                        // Nombre
+
                         Text(
-                          widget.userName,
+                          user.fullName,
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
@@ -127,9 +147,9 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
 
                         const SizedBox(height: AppConstants.smallPadding),
 
-                        // Edad
+
                         Text(
-                          '${widget.userAge} años',
+                          '$userAge años',
                           style: TextStyle(
                             fontSize: 18,
                             color: isDark
@@ -143,7 +163,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
 
                     const SizedBox(height: 32),
 
-                    // Sección de intereses
+
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -161,12 +181,12 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
 
                         const SizedBox(height: AppConstants.defaultPadding),
 
-                        // Tags de intereses
+
                         Wrap(
                           spacing: 12,
                           runSpacing: 12,
                           alignment: WrapAlignment.center,
-                          children: widget.userInterests.map((interest) {
+                          children: user.interests.map((interest) {
                             return Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: AppConstants.defaultPadding,
@@ -183,7 +203,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
                                 ),
                               ),
                               child: Text(
-                                interest,
+                                interest.name, 
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
@@ -208,7 +228,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: _editProfile,
+                            onPressed: () => _editProfile(context, ref, isDark),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppConstants.primaryColor,
                               foregroundColor: Colors.white,
@@ -238,14 +258,12 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
                             ),
                           ),
                         ),
-
                         const SizedBox(height: AppConstants.defaultPadding),
-
                         // Botón Historial de Interacciones
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: _viewHistory,
+                            onPressed: () => _viewHistory(context),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: isDark
                                   ? AppConstants.backgroundDark.withOpacity(0.5)
@@ -284,8 +302,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
                         ),
                       ],
                     ),
-
-                    const SizedBox(height: 100), // Espacio para navegación
+                    const SizedBox(height: 100), 
                   ],
                 ),
               ),
@@ -293,11 +310,10 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
           ],
         ),
       ),
-
-      // Bottom Navigation
       bottomNavigationBar: _buildBottomNavigation(context, isDark),
     );
   }
+
 
   Widget _buildBottomNavigation(BuildContext context, bool isDark) {
     return Container(
@@ -312,13 +328,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
           ),
         ),
         boxShadow: isDark
-            ? [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                ),
-              ]
+            ? [ BoxShadow( color: Colors.black.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, -2),),]
             : [],
       ),
       child: SafeArea(
@@ -337,7 +347,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
                 label: 'Inicio',
                 isActive: false,
                 isDark: isDark,
-                onTap: () => context.go('/elderly/home'),
+                onTap: () => context.goNamed('elderly-home'), 
               ),
               _buildNavItem(
                 context: context,
@@ -353,7 +363,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
                 label: 'Actividades',
                 isActive: false,
                 isDark: isDark,
-                onTap: () => context.go('/elderly/activities'),
+                onTap: () => context.goNamed('activities-elderly'), 
               ),
             ],
           ),
@@ -403,11 +413,10 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
     );
   }
 
-  void _editProfile() {
+  void _editProfile(BuildContext context, WidgetRef ref, bool isDark) {
     showDialog(
       context: context,
       builder: (context) {
-        final isDark = ref.watch(themeNotifierProvider).isDarkMode;
         return AlertDialog(
           backgroundColor: isDark 
               ? AppConstants.backgroundDark 
@@ -449,9 +458,7 @@ class _ProfileScreenState extends ConsumerState<ProfileElderlyScreen> {
     );
   }
 
-  void _viewHistory() {
-    // Nota: Asume que hay una ruta de historial para elderly
-    // Ajusta según tu go_router configuration
-    context.go('/elderly/history');
+  void _viewHistory(BuildContext context) {
+    context.pushNamed('history');
   }
 }
