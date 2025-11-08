@@ -4,7 +4,6 @@ import 'package:vinculo/screens/elderly/active_volunteers_screen.dart';
 import 'package:vinculo/screens/elderly/activities_elderly_screen.dart';
 import 'package:vinculo/screens/elderly/home_elderly_screen.dart';
 import 'package:vinculo/screens/elderly/profile_elderly_screen.dart';
-import 'package:vinculo/screens/elderly/register_elderly_screen.dart';
 import 'package:vinculo/screens/elderly/videocall_screen.dart';
 import 'package:vinculo/screens/landig_screen.dart';
 import 'package:vinculo/screens/login_screen.dart';
@@ -16,7 +15,6 @@ import 'package:vinculo/screens/volunteer/contact_profile_screen.dart';
 import 'package:vinculo/screens/volunteer/history_screen.dart';
 import 'package:vinculo/screens/volunteer/matches_screen.dart';
 import 'package:vinculo/screens/volunteer/profile_screen.dart';
-import 'package:vinculo/screens/volunteer/register_volunteer_screen.dart';
 import 'package:vinculo/screens/volunteer/rewards_screen.dart';
 import 'package:vinculo/screens/volunteer/volunteer_home_screen.dart';
 
@@ -57,12 +55,6 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/volunteer',
       redirect: (context, state) => '/volunteer/home', // Redirect a home por defecto
-    ),
-    
-    GoRoute(
-      path: '/volunteer/register',
-      name: 'register-volunteer',
-      builder: (context, state) => const RegisterVolunteerScreen(),
     ),
     
     GoRoute(
@@ -124,12 +116,6 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/elderly',
       redirect: (context, state) => '/elderly/home',
-    ),
-    
-    GoRoute(
-      path: '/elderly/register',
-      name: 'register-elderly',
-      builder: (context, state) => const RegisterElderlyScreen(),
     ),
     
     GoRoute(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vinculo/config/providers/presentation/theme_provider.dart';
-import 'package:vinculo/config/router/go_router_config.dart'; // ← NUEVO IMPORT
+import 'package:vinculo/config/router/go_router_config.dart'; 
 import 'package:vinculo/utils/constants.dart';
 
 void main() {
