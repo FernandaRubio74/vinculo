@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart'; // ← NUEVO IMPORT
+import 'package:go_router/go_router.dart';
 import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
+import 'package:vinculo/config/providers/auth_provider.dart';
+import 'package:vinculo/models/user_model.dart';
+import 'package:vinculo/config/providers/active_connections_provider.dart'; 
+import 'package:vinculo/config/providers/pending_connections_provider.dart';
+
 
 class VolunteerHomeScreen extends ConsumerWidget {
   const VolunteerHomeScreen({super.key});
@@ -10,6 +15,9 @@ class VolunteerHomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = ref.watch(themeNotifierProvider).isDarkMode;
+    final activeConnections = ref.watch(activeConnectionsProvider);
+    final currentUser = ref.watch(currentUserProvider);
+    final pendingConnections = ref.watch(pendingConnectionsProvider);
 
     return Scaffold(
       backgroundColor: isDark
@@ -18,25 +26,12 @@ class VolunteerHomeScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text(
-          'VínculoVital',
-          style: TextStyle(
-            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Public Sans',
-          ),
-        ),
+        title: Text('VínculoVital', style: TextStyle(color: isDark ? AppConstants.hintColor : AppConstants.textColor, fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Public Sans',),),
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {
-              context.push('/settings'); // ← CAMBIO 1
-            },
-            icon: Icon(
-              Icons.settings,
-              color: isDark ? AppConstants.hintColor : AppConstants.textColor,
-            ),
+            onPressed: () => context.pushNamed('settings'),
+            icon: Icon(Icons.settings, color: isDark ? AppConstants.hintColor : AppConstants.textColor,),
           ),
         ],
       ),
@@ -45,9 +40,8 @@ class VolunteerHomeScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Saludo personalizado
             Text(
-              '¡Hola, Carlos!',
+              '¡Hola, ${currentUser?.fullName.split(' ')[0] ?? 'Voluntario'}!',
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -55,37 +49,33 @@ class VolunteerHomeScreen extends ConsumerWidget {
                 fontFamily: 'Public Sans',
               ),
             ),
-
             const SizedBox(height: 20),
 
-            // Sección de Conexiones Destacadas
-            _buildSectionTitle('Conexiones Destacadas', isDark),
+            _buildSectionTitle('Solicitudes Pendientes', isDark),
             const SizedBox(height: 12),
-            _buildFeaturedConnections(isDark),
+            pendingConnections.when(
+              loading: () => const Center(child: CircularProgressIndicator(color: AppConstants.primaryColor)),
+              error: (err, stack) => const Center(child: Text('Error al cargar solicitudes.')),
+              data: (requests) => _buildPendingRequests(ref, isDark, requests),
+            ),
+            const SizedBox(height: 20),
 
-            // Botón "Ver Conexiones"
+
+            _buildSectionTitle('Conexiones Activas', isDark),
+            const SizedBox(height: 12),
+            activeConnections.when(
+              loading: () => const Center(heightFactor: 3, child: CircularProgressIndicator(color: AppConstants.primaryColor)),
+              error: (err, stack) => const Center(child: Text('No se pudieron cargar tus conexiones.')),
+              data: (connections) => _buildFeaturedConnections(isDark, connections),
+            ),
+
             const SizedBox(height: 16),
             _buildViewConnectionsButton(context, isDark),
-
             const SizedBox(height: 20),
-
-            // Sección de Anuncios para Voluntarios
+            
             _buildSectionTitle('Anuncios para Voluntarios', isDark),
             const SizedBox(height: 12),
             _buildAnnouncementCard(isDark),
-
-            const SizedBox(height: 20),
-
-            // Sección de Progreso de Recompensas
-            _buildSectionTitle('Progreso de Recompensas', isDark),
-            const SizedBox(height: 12),
-            _buildRewardsProgress(isDark),
-
-            const SizedBox(height: 20),
-
-            // Acciones rápidas mejoradas
-            _buildQuickActions(context, isDark),
-
             const SizedBox(height: 20),
           ],
         ),
@@ -93,6 +83,136 @@ class VolunteerHomeScreen extends ConsumerWidget {
       bottomNavigationBar: _buildBottomNavigation(context, isDark),
     );
   }
+
+
+  Widget _buildPendingRequests(WidgetRef ref, bool isDark, List<PendingConnection> requests) {
+    if (requests.isEmpty) {
+      return Container(
+        height: 90,
+        alignment: Alignment.center,
+        child: Text(
+          'No tienes solicitudes pendientes.',
+          style: TextStyle(color: Colors.grey.shade600),
+        ),
+      );
+    }
+    
+
+    return SizedBox(
+      height: 160, 
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: requests.length,
+        itemBuilder: (context, index) {
+          final request = requests[index];
+          return _buildPendingCard(ref, isDark, request);
+        },
+      ),
+    );
+  }
+
+
+  Widget _buildPendingCard(WidgetRef ref, bool isDark, PendingConnection request) {
+    return Container(
+      width: 280, // Ancho de la tarjeta
+      margin: const EdgeInsets.only(right: 12),
+      decoration: BoxDecoration(
+        color: isDark ? AppConstants.backgroundDark : Colors.white,
+        borderRadius: BorderRadius.circular(16), 
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [AppConstants.backgroundDark, AppConstants.backgroundDark.withOpacity(0.8)]
+              : [Colors.white, Colors.grey.shade50],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppConstants.defaultPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 50, height: 50,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppConstants.primaryColor.withOpacity(0.2),
+                  ),
+                  child: const Icon(Icons.person, size: 24, color: AppConstants.primaryColor),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        request.user.fullName,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        'Quiere conectar contigo',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isDark ? AppConstants.hintColor : Colors.grey.shade700
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(), 
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+
+                TextButton(
+                  onPressed: () {
+                    ref.read(pendingConnectionsProvider.notifier).rejectRequest(request.connectionId);
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+                  ),
+                  child: const Text('Rechazar'),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: () {
+                    ref.read(pendingConnectionsProvider.notifier).acceptRequest(request.connectionId);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppConstants.primaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: const Text('Aceptar'),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+
 
   Widget _buildSectionTitle(String title, bool isDark) {
     return Text(
@@ -106,64 +226,54 @@ class VolunteerHomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFeaturedConnections(bool isDark) {
-    final connections = [
-      {'name': 'Carlos', 'status': 'Próxima sesión:\nMañana'},
-      {'name': 'Elena', 'status': 'Próxima sesión: 2 días'},
-      {'name': 'Roberto', 'status': 'Próxima ses...'},
-    ];
-
+  Widget _buildFeaturedConnections(bool isDark, List<UserModel> connections) {
+    if (connections.isEmpty) {
+      return Container(
+        height: 90,
+        alignment: Alignment.center,
+        child: Text(
+          'Aún no tienes conexiones activas.',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.grey.shade600),
+        ),
+      );
+    }
+    
     return SizedBox(
       height: 90,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: connections.length,
         itemBuilder: (context, index) {
-          final connection = connections[index];
+          final user = connections[index];
           return Container(
             width: 85,
             margin: const EdgeInsets.only(right: 12),
             child: Column(
               children: [
-                // Avatar circular
                 Container(
-                  width: 50,
-                  height: 50,
+                  width: 50, height: 50,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isDark
-                        ? Colors.grey.shade700
-                        : Colors.grey.shade300,
-                    border: Border.all(
-                      color: AppConstants.primaryColor,
-                      width: 2,
-                    ),
+                    color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                    border: Border.all(color: AppConstants.primaryColor, width: 2,),
                   ),
-                  child: Icon(
-                    Icons.person,
-                    size: 25,
-                    color: isDark
-                        ? Colors.grey.shade400
-                        : Colors.grey.shade600,
-                  ),
+                  child: Icon(Icons.person, size: 25, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,),
                 ),
                 const SizedBox(height: 6),
-                // Nombre
                 Text(
-                  connection['name']!,
+                  user.fullName.split(' ')[0], 
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppConstants.hintColor
-                        : AppConstants.textColor,
+                    color: isDark ? AppConstants.hintColor : AppConstants.textColor,
                     fontFamily: 'Public Sans',
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                // Estado
                 Flexible(
                   child: Text(
-                    connection['status']!,
+                    'Conectado', 
                     style: TextStyle(
                       fontSize: 9,
                       color: isDark
@@ -172,8 +282,6 @@ class VolunteerHomeScreen extends ConsumerWidget {
                       fontFamily: 'Public Sans',
                     ),
                     textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -189,20 +297,18 @@ class VolunteerHomeScreen extends ConsumerWidget {
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: () {
-          context.push('/volunteer/matches'); // ← CAMBIO 2
+          context.goNamed('matches');
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppConstants.primaryColor,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: isDark ? 6 : 2,
         ),
         icon: const Icon(Icons.people, size: 20),
         label: const Text(
-          'Ver Conexiones',
+          'Buscar Nuevos Matches', 
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -276,192 +382,7 @@ class VolunteerHomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildRewardsProgress(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppConstants.backgroundDark.withOpacity(0.5)
-            : Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark
-              ? AppConstants.primaryColor.withOpacity(0.3)
-              : Colors.grey.shade200,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text(
-                  'Próxima Recompensa: Vale de Café',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppConstants.hintColor
-                        : AppConstants.textColor,
-                    fontFamily: 'Public Sans',
-                  ),
-                ),
-              ),
-              Text(
-                '75/100',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppConstants.primaryColor,
-                  fontFamily: 'Public Sans',
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          // Barra de progreso
-          Container(
-            height: 8,
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.grey.shade800
-                  : Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: 0.75,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppConstants.primaryColor,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'Puntos',
-            style: TextStyle(
-              fontSize: 12,
-              color: isDark
-                  ? AppConstants.hintColor.withOpacity(0.7)
-                  : AppConstants.textColor.withOpacity(0.7),
-              fontFamily: 'Public Sans',
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '¡Sigue así! Estás a solo 25 puntos de tu recompensa.',
-            style: TextStyle(
-              fontSize: 12,
-              color: isDark
-                  ? AppConstants.hintColor.withOpacity(0.7)
-                  : AppConstants.textColor.withOpacity(0.7),
-              fontFamily: 'Public Sans',
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickActions(BuildContext context, bool isDark) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildActionButton(
-            icon: Icons.assignment,
-            title: 'Registrar\nSesión',
-            color: isDark
-                ? Colors.blue.shade900.withOpacity(0.3)
-                : Colors.blue.shade50,
-            iconColor: AppConstants.primaryColor,
-            borderColor: isDark
-                ? Colors.blue.shade700.withOpacity(0.5)
-                : Colors.blue.shade200,
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Funcionalidad de registrar sesión en desarrollo',
-                  ),
-                  backgroundColor: AppConstants.primaryColor,
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildActionButton(
-            icon: Icons.explore,
-            title: 'Explorar\nActividades',
-            color: AppConstants.primaryColor,
-            iconColor: Colors.white,
-            borderColor: AppConstants.primaryColor,
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Funcionalidad de explorar actividades en desarrollo',
-                  ),
-                  backgroundColor: AppConstants.primaryColor,
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required String title,
-    required Color color,
-    required Color iconColor,
-    required Color borderColor,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 80,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: borderColor, width: 1),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 20, color: iconColor),
-            const SizedBox(height: 6),
-            Flexible(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: iconColor,
-                  fontFamily: 'Public Sans',
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
+ 
   Widget _buildBottomNavigation(BuildContext context, bool isDark) {
     return Container(
       height: 80,
@@ -488,7 +409,7 @@ class VolunteerHomeScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           GestureDetector(
-            onTap: () {}, // Ya estamos en home
+            onTap: () {}, 
             child: _buildNavItem(
               icon: Icons.home,
               label: 'Inicio',
@@ -498,7 +419,7 @@ class VolunteerHomeScreen extends ConsumerWidget {
           ),
           GestureDetector(
             onTap: () {
-              context.push('/volunteer/matches'); // ← CAMBIO 3
+              context.goNamed('matches');
             },
             child: _buildNavItem(
               icon: Icons.people,
@@ -509,7 +430,7 @@ class VolunteerHomeScreen extends ConsumerWidget {
           ),
           GestureDetector(
             onTap: () {
-              context.push('/volunteer/rewards'); // ← CAMBIO 4
+              context.goNamed('rewards');
             },
             child: _buildNavItem(
               icon: Icons.card_giftcard,
@@ -520,7 +441,7 @@ class VolunteerHomeScreen extends ConsumerWidget {
           ),
           GestureDetector(
             onTap: () {
-              context.push('/volunteer/profile'); // ← CAMBIO 5
+              context.goNamed('volunteer-profile');
             },
             child: _buildNavItem(
               icon: Icons.person,
@@ -540,6 +461,7 @@ class VolunteerHomeScreen extends ConsumerWidget {
     required bool isActive,
     required bool isDark,
   }) {
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
