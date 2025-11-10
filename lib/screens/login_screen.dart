@@ -16,13 +16,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-
-  final TextEditingController _emailController = TextEditingController(
-    text: "andres@gmail.com",
-  );
-  final TextEditingController _passwordController = TextEditingController(
-    text: "Rubio123!",
-  );
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void dispose() {
@@ -33,21 +28,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final isDark = ref.watch(themeNotifierProvider).isDarkMode;
-
 
     final authState = ref.watch(authProvider);
     final isLoading = authState == AuthState.loading;
 
     return Scaffold(
-
       backgroundColor: isDark
           ? AppConstants.backgroundDark
           : AppConstants.backgroundColor,
       body: Stack(
         children: [
-
           Positioned(
             top: -80,
             left: -80,
@@ -87,7 +78,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
 
-
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -108,8 +98,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             style: TextStyle(
                               fontSize: 48,
                               fontWeight: FontWeight.w800,
-                              color: AppConstants
-                                  .primaryColor, 
+                              color: AppConstants.primaryColor,
                               fontFamily: 'Public Sans',
                             ),
                           ),
@@ -130,7 +119,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                       const SizedBox(height: 48),
 
- 
                       const SizedBox(height: 24),
 
                       Column(
@@ -150,7 +138,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           const SizedBox(height: AppConstants.defaultPadding),
 
-
                           Column(
                             children: [
                               if (isLoading)
@@ -162,8 +149,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               else
                                 CustomButton(
                                   text: 'Iniciar Sesión',
-                                  onPressed:
-                                      _handleLogin, 
+                                  onPressed: _handleLogin,
                                   color: AppConstants.primaryColor,
                                   textColor: AppConstants.backgroundColor,
                                 ),
@@ -173,7 +159,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               CustomButton(
                                 text: 'Registro',
                                 onPressed: () {
-        
                                   context.pushNamed('register');
                                 },
                                 color: isDark
@@ -210,7 +195,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-
   Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -225,7 +209,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (result.isSuccess && result.user != null) {
       if (!mounted) return;
-
 
       if (result.user!.type == UserType.elderly) {
         context.goNamed('elderly-home');

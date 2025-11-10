@@ -88,9 +88,9 @@ class VolunteerHomeScreen extends ConsumerWidget {
                 child: Text('No se pudieron cargar tus conexiones.'),
               ),
               data: (connections) {
-                // Extraer los UserModel de ConnectionWithId
-                final users = connections.map((conn) => conn.user).toList();
-                return _buildFeaturedConnections(isDark, users);
+                // ¡No extraigas! Pasa la lista de conexiones completa.
+                // También pasamos 'context' para poder navegar.
+                return _buildFeaturedConnections(context, isDark, connections);
               },
             ),
 
@@ -269,7 +269,12 @@ class VolunteerHomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFeaturedConnections(bool isDark, List<UserModel> connections) {
+  // 1. Cambiamos la firma para aceptar BuildContext y List<ConnectionWithId>
+  Widget _buildFeaturedConnections(
+    BuildContext context,
+    bool isDark,
+    List<ConnectionWithId> connections,
+  ) {
     if (connections.isEmpty) {
       return Container(
         height: 90,
@@ -288,56 +293,78 @@ class VolunteerHomeScreen extends ConsumerWidget {
         scrollDirection: Axis.horizontal,
         itemCount: connections.length,
         itemBuilder: (context, index) {
-          final user = connections[index];
-          return Container(
-            width: 85,
-            margin: const EdgeInsets.only(right: 12),
-            child: Column(
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
-                    border: Border.all(
-                      color: AppConstants.primaryColor,
-                      width: 2,
+          // 2. Ahora 'connection' tiene el ID y el usuario
+          final connection = connections[index];
+          final user = connection.user;
+
+          // 3. Agregamos un InkWell para que sea 'tocable'
+          return InkWell(
+            onTap: () {
+              context.pushNamed(
+                'chat',
+                pathParameters: {
+                  'contactId': user.id,
+                  'connectionId':
+                      connection.connectionId, // <-- Usamos el ID de conexión
+                },
+                queryParameters: {'name': user.fullName, 'bio': user.bio ?? ''},
+              );
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              width: 85,
+              margin: const EdgeInsets.only(right: 12),
+              child: Column(
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isDark
+                          ? Colors.grey.shade700
+                          : Colors.grey.shade300,
+                      border: Border.all(
+                        color: AppConstants.primaryColor,
+                        width: 2,
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.person,
+                      size: 25,
+                      color: isDark
+                          ? Colors.grey.shade400
+                          : Colors.grey.shade600,
                     ),
                   ),
-                  child: Icon(
-                    Icons.person,
-                    size: 25,
-                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  user.fullName.split(' ')[0],
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppConstants.hintColor
-                        : AppConstants.textColor,
-                    fontFamily: 'Public Sans',
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Flexible(
-                  child: Text(
-                    'Conectado',
+                  const SizedBox(height: 6),
+                  Text(
+                    user.fullName.split(' ')[0],
                     style: TextStyle(
-                      fontSize: 9,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
                       color: isDark
-                          ? AppConstants.hintColor.withOpacity(0.7)
-                          : AppConstants.textColor.withOpacity(0.7),
+                          ? AppConstants.hintColor
+                          : AppConstants.textColor,
                       fontFamily: 'Public Sans',
                     ),
-                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
+                  Flexible(
+                    child: Text(
+                      'Conectado',
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: isDark
+                            ? AppConstants.hintColor.withOpacity(0.7)
+                            : AppConstants.textColor.withOpacity(0.7),
+                        fontFamily: 'Public Sans',
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },
