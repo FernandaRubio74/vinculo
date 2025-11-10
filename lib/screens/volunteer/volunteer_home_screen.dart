@@ -5,9 +5,8 @@ import 'package:vinculo/config/providers/presentation/theme_provider.dart';
 import 'package:vinculo/utils/constants.dart';
 import 'package:vinculo/config/providers/auth_provider.dart';
 import 'package:vinculo/models/user_model.dart';
-import 'package:vinculo/config/providers/active_connections_provider.dart'; 
+import 'package:vinculo/config/providers/active_connections_provider.dart';
 import 'package:vinculo/config/providers/pending_connections_provider.dart';
-
 
 class VolunteerHomeScreen extends ConsumerWidget {
   const VolunteerHomeScreen({super.key});
@@ -26,12 +25,23 @@ class VolunteerHomeScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('VínculoVital', style: TextStyle(color: isDark ? AppConstants.hintColor : AppConstants.textColor, fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Public Sans',),),
+        title: Text(
+          'VínculoVital',
+          style: TextStyle(
+            color: isDark ? AppConstants.hintColor : AppConstants.textColor,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Public Sans',
+          ),
+        ),
         centerTitle: true,
         actions: [
           IconButton(
             onPressed: () => context.pushNamed('settings'),
-            icon: Icon(Icons.settings, color: isDark ? AppConstants.hintColor : AppConstants.textColor,),
+            icon: Icon(
+              Icons.settings,
+              color: isDark ? AppConstants.hintColor : AppConstants.textColor,
+            ),
           ),
         ],
       ),
@@ -54,25 +64,40 @@ class VolunteerHomeScreen extends ConsumerWidget {
             _buildSectionTitle('Solicitudes Pendientes', isDark),
             const SizedBox(height: 12),
             pendingConnections.when(
-              loading: () => const Center(child: CircularProgressIndicator(color: AppConstants.primaryColor)),
-              error: (err, stack) => const Center(child: Text('Error al cargar solicitudes.')),
+              loading: () => const Center(
+                child: CircularProgressIndicator(
+                  color: AppConstants.primaryColor,
+                ),
+              ),
+              error: (err, stack) =>
+                  const Center(child: Text('Error al cargar solicitudes.')),
               data: (requests) => _buildPendingRequests(ref, isDark, requests),
             ),
             const SizedBox(height: 20),
 
-
             _buildSectionTitle('Conexiones Activas', isDark),
             const SizedBox(height: 12),
             activeConnections.when(
-              loading: () => const Center(heightFactor: 3, child: CircularProgressIndicator(color: AppConstants.primaryColor)),
-              error: (err, stack) => const Center(child: Text('No se pudieron cargar tus conexiones.')),
-              data: (connections) => _buildFeaturedConnections(isDark, connections),
+              loading: () => const Center(
+                heightFactor: 3,
+                child: CircularProgressIndicator(
+                  color: AppConstants.primaryColor,
+                ),
+              ),
+              error: (err, stack) => const Center(
+                child: Text('No se pudieron cargar tus conexiones.'),
+              ),
+              data: (connections) {
+                // Extraer los UserModel de ConnectionWithId
+                final users = connections.map((conn) => conn.user).toList();
+                return _buildFeaturedConnections(isDark, users);
+              },
             ),
 
             const SizedBox(height: 16),
             _buildViewConnectionsButton(context, isDark),
             const SizedBox(height: 20),
-            
+
             _buildSectionTitle('Anuncios para Voluntarios', isDark),
             const SizedBox(height: 12),
             _buildAnnouncementCard(isDark),
@@ -84,8 +109,11 @@ class VolunteerHomeScreen extends ConsumerWidget {
     );
   }
 
-
-  Widget _buildPendingRequests(WidgetRef ref, bool isDark, List<PendingConnection> requests) {
+  Widget _buildPendingRequests(
+    WidgetRef ref,
+    bool isDark,
+    List<PendingConnection> requests,
+  ) {
     if (requests.isEmpty) {
       return Container(
         height: 90,
@@ -96,10 +124,9 @@ class VolunteerHomeScreen extends ConsumerWidget {
         ),
       );
     }
-    
 
     return SizedBox(
-      height: 160, 
+      height: 160,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: requests.length,
@@ -111,19 +138,25 @@ class VolunteerHomeScreen extends ConsumerWidget {
     );
   }
 
-
-  Widget _buildPendingCard(WidgetRef ref, bool isDark, PendingConnection request) {
+  Widget _buildPendingCard(
+    WidgetRef ref,
+    bool isDark,
+    PendingConnection request,
+  ) {
     return Container(
       width: 280, // Ancho de la tarjeta
       margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
         color: isDark ? AppConstants.backgroundDark : Colors.white,
-        borderRadius: BorderRadius.circular(16), 
+        borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [AppConstants.backgroundDark, AppConstants.backgroundDark.withOpacity(0.8)]
+              ? [
+                  AppConstants.backgroundDark,
+                  AppConstants.backgroundDark.withOpacity(0.8),
+                ]
               : [Colors.white, Colors.grey.shade50],
         ),
         boxShadow: [
@@ -142,12 +175,17 @@ class VolunteerHomeScreen extends ConsumerWidget {
             Row(
               children: [
                 Container(
-                  width: 50, height: 50,
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppConstants.primaryColor.withOpacity(0.2),
                   ),
-                  child: const Icon(Icons.person, size: 24, color: AppConstants.primaryColor),
+                  child: const Icon(
+                    Icons.person,
+                    size: 24,
+                    color: AppConstants.primaryColor,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -167,7 +205,9 @@ class VolunteerHomeScreen extends ConsumerWidget {
                         'Quiere conectar contigo',
                         style: TextStyle(
                           fontSize: 14,
-                          color: isDark ? AppConstants.hintColor : Colors.grey.shade700
+                          color: isDark
+                              ? AppConstants.hintColor
+                              : Colors.grey.shade700,
                         ),
                       ),
                     ],
@@ -175,25 +215,30 @@ class VolunteerHomeScreen extends ConsumerWidget {
                 ),
               ],
             ),
-            const Spacer(), 
+            const Spacer(),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-
                 TextButton(
                   onPressed: () {
-                    ref.read(pendingConnectionsProvider.notifier).rejectRequest(request.connectionId);
+                    ref
+                        .read(pendingConnectionsProvider.notifier)
+                        .rejectRequest(request.connectionId);
                   },
                   style: TextButton.styleFrom(
-                    foregroundColor: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+                    foregroundColor: isDark
+                        ? Colors.grey.shade400
+                        : Colors.grey.shade700,
                   ),
                   child: const Text('Rechazar'),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {
-                    ref.read(pendingConnectionsProvider.notifier).acceptRequest(request.connectionId);
+                    ref
+                        .read(pendingConnectionsProvider.notifier)
+                        .acceptRequest(request.connectionId);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppConstants.primaryColor,
@@ -205,14 +250,12 @@ class VolunteerHomeScreen extends ConsumerWidget {
                   child: const Text('Aceptar'),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
     );
   }
-
-
 
   Widget _buildSectionTitle(String title, bool isDark) {
     return Text(
@@ -238,7 +281,7 @@ class VolunteerHomeScreen extends ConsumerWidget {
         ),
       );
     }
-    
+
     return SizedBox(
       height: 90,
       child: ListView.builder(
@@ -252,28 +295,38 @@ class VolunteerHomeScreen extends ConsumerWidget {
             child: Column(
               children: [
                 Container(
-                  width: 50, height: 50,
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
-                    border: Border.all(color: AppConstants.primaryColor, width: 2,),
+                    border: Border.all(
+                      color: AppConstants.primaryColor,
+                      width: 2,
+                    ),
                   ),
-                  child: Icon(Icons.person, size: 25, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,),
+                  child: Icon(
+                    Icons.person,
+                    size: 25,
+                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  user.fullName.split(' ')[0], 
+                  user.fullName.split(' ')[0],
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppConstants.hintColor : AppConstants.textColor,
+                    color: isDark
+                        ? AppConstants.hintColor
+                        : AppConstants.textColor,
                     fontFamily: 'Public Sans',
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Flexible(
                   child: Text(
-                    'Conectado', 
+                    'Conectado',
                     style: TextStyle(
                       fontSize: 9,
                       color: isDark
@@ -303,12 +356,14 @@ class VolunteerHomeScreen extends ConsumerWidget {
           backgroundColor: AppConstants.primaryColor,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           elevation: isDark ? 6 : 2,
         ),
         icon: const Icon(Icons.people, size: 20),
         label: const Text(
-          'Buscar Nuevos Matches', 
+          'Buscar Nuevos Matches',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -382,7 +437,6 @@ class VolunteerHomeScreen extends ConsumerWidget {
     );
   }
 
- 
   Widget _buildBottomNavigation(BuildContext context, bool isDark) {
     return Container(
       height: 80,
@@ -409,7 +463,7 @@ class VolunteerHomeScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           GestureDetector(
-            onTap: () {}, 
+            onTap: () {},
             child: _buildNavItem(
               icon: Icons.home,
               label: 'Inicio',
@@ -461,7 +515,6 @@ class VolunteerHomeScreen extends ConsumerWidget {
     required bool isActive,
     required bool isDark,
   }) {
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -470,8 +523,8 @@ class VolunteerHomeScreen extends ConsumerWidget {
           color: isActive
               ? AppConstants.primaryColor
               : (isDark
-                  ? AppConstants.hintColor.withOpacity(0.5)
-                  : AppConstants.textColor.withOpacity(0.5)),
+                    ? AppConstants.hintColor.withOpacity(0.5)
+                    : AppConstants.textColor.withOpacity(0.5)),
           size: 24,
         ),
         const SizedBox(height: 4),
@@ -482,8 +535,8 @@ class VolunteerHomeScreen extends ConsumerWidget {
             color: isActive
                 ? AppConstants.primaryColor
                 : (isDark
-                    ? AppConstants.hintColor.withOpacity(0.5)
-                    : AppConstants.textColor.withOpacity(0.5)),
+                      ? AppConstants.hintColor.withOpacity(0.5)
+                      : AppConstants.textColor.withOpacity(0.5)),
             fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
             fontFamily: 'Public Sans',
           ),

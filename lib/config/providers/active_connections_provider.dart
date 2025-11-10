@@ -4,8 +4,19 @@ import 'package:vinculo/models/user_model.dart';
 import 'package:vinculo/services/api_service.dart';
 import 'package:vinculo/config/providers/auth_provider.dart';
 
-/// provider para las conexiones "amigos"
-final activeConnectionsProvider = FutureProvider<List<UserModel>>((ref) async {
+/// Clase para envolver usuario con su connectionId
+class ConnectionWithId {
+  final UserModel user;
+  final String connectionId;
+
+  ConnectionWithId({
+    required this.user,
+    required this.connectionId,
+  });
+}
+
+/// Provider para las conexiones "amigos"
+final activeConnectionsProvider = FutureProvider<List<ConnectionWithId>>((ref) async {
   final apiService = ref.read(apiServiceProvider);
   final currentUser = ref.watch(currentUserProvider); // 'watch' reacciona al login
 
@@ -24,20 +35,27 @@ final activeConnectionsProvider = FutureProvider<List<UserModel>>((ref) async {
     return []; 
   }
 
-
-  final List<UserModel> connections = [];
+  final List<ConnectionWithId> connections = [];
   
   for (var connectionJson in response) {
     try {
-
+      // Extraer el connectionId
+      final connectionId = connectionJson['id'] as String;
+      
       final elderUser = UserModel.fromJson(connectionJson['elder'] as Map<String, dynamic>);
       final youngUser = UserModel.fromJson(connectionJson['young'] as Map<String, dynamic>);
 
-      
+      // Agregar el usuario opuesto con su connectionId
       if (elderUser.id == currentUserId) {
-        connections.add(youngUser);
+        connections.add(ConnectionWithId(
+          user: youngUser,
+          connectionId: connectionId,
+        ));
       } else if (youngUser.id == currentUserId) {
-        connections.add(elderUser);
+        connections.add(ConnectionWithId(
+          user: elderUser,
+          connectionId: connectionId,
+        ));
       }
       
     } catch (e) {

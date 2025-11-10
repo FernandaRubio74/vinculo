@@ -42,7 +42,9 @@ class ActivitiesScreen extends ConsumerWidget {
                     onPressed: () => context.go('/settings'),
                     icon: Icon(
                       Icons.settings,
-                      color: isDark ? AppConstants.hintColor : AppConstants.textColor,
+                      color: isDark
+                          ? AppConstants.hintColor
+                          : AppConstants.textColor,
                       size: 30,
                     ),
                   ),
@@ -60,7 +62,7 @@ class ActivitiesScreen extends ConsumerWidget {
                   children: [
                     const SizedBox(height: AppConstants.largePadding),
                     Text(
-                      'Tus Conexiones', 
+                      'Tus Conexiones',
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -73,24 +75,29 @@ class ActivitiesScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Inicia una videollamada o chat con tus amigos.', 
+                      'Inicia una videollamada o chat con tus amigos.',
                       style: TextStyle(
                         fontSize: 16,
-                        color: isDark ? AppConstants.hintColor : Colors.grey.shade700,
+                        color: isDark
+                            ? AppConstants.hintColor
+                            : Colors.grey.shade700,
                         fontFamily: 'Public Sans',
                       ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 48),
 
-
                     Expanded(
                       child: activeConnections.when(
                         loading: () => const Center(
-                          child: CircularProgressIndicator(color: AppConstants.primaryColor),
+                          child: CircularProgressIndicator(
+                            color: AppConstants.primaryColor,
+                          ),
                         ),
                         error: (err, stack) => Center(
-                          child: Text('Error al cargar conexiones: ${err.toString()}'),
+                          child: Text(
+                            'Error al cargar conexiones: ${err.toString()}',
+                          ),
                         ),
                         data: (connections) {
                           if (connections.isEmpty) {
@@ -109,8 +116,13 @@ class ActivitiesScreen extends ConsumerWidget {
                           return ListView.builder(
                             itemCount: connections.length,
                             itemBuilder: (context, index) {
-                              final user = connections[index];
-                              return _buildConnectionCard(context, user, isDark);
+                              final connection =
+                                  connections[index]; // Ahora es ConnectionWithId
+                              return _buildConnectionCard(
+                                context,
+                                connection,
+                                isDark,
+                              );
                             },
                           );
                         },
@@ -127,13 +139,21 @@ class ActivitiesScreen extends ConsumerWidget {
     );
   }
 
- 
-  Widget _buildConnectionCard(BuildContext context, UserModel user, bool isDark) {
+  Widget _buildConnectionCard(
+    BuildContext context,
+    ConnectionWithId connection,
+    bool isDark,
+  ) {
+    final user = connection.user;
+    final connectionId = connection.connectionId;
+
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(bottom: AppConstants.defaultPadding),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: isDark ? AppConstants.backgroundDark.withOpacity(0.8) : Colors.white,
+      color: isDark
+          ? AppConstants.backgroundDark.withOpacity(0.8)
+          : Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(AppConstants.defaultPadding),
         child: Row(
@@ -146,7 +166,11 @@ class ActivitiesScreen extends ConsumerWidget {
                 shape: BoxShape.circle,
                 color: AppConstants.primaryColor.withOpacity(0.2),
               ),
-              child: const Icon(Icons.person, size: 30, color: AppConstants.primaryColor),
+              child: const Icon(
+                Icons.person,
+                size: 30,
+                color: AppConstants.primaryColor,
+              ),
             ),
             const SizedBox(width: AppConstants.defaultPadding),
             Expanded(
@@ -166,7 +190,9 @@ class ActivitiesScreen extends ConsumerWidget {
                     user.bio ?? 'Conectado',
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDark ? AppConstants.hintColor : Colors.grey.shade700,
+                      color: isDark
+                          ? AppConstants.hintColor
+                          : Colors.grey.shade700,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -176,15 +202,41 @@ class ActivitiesScreen extends ConsumerWidget {
             ),
             const SizedBox(width: 8),
 
+            // Botón de Chat
+            IconButton(
+              onPressed: () {
+                context.pushNamed(
+                  'chat',
+                  pathParameters: {
+                    'contactId': user.id,
+                    'connectionId': connectionId,
+                  },
+                  queryParameters: {
+                    'name': user.fullName,
+                    'bio': user.bio ?? '',
+                  },
+                );
+              },
+              icon: const Icon(
+                Icons.chat_bubble_outline,
+                color: AppConstants.primaryColor,
+                size: 28,
+              ),
+            ),
+
             // Botón de Videollamada
             IconButton(
               onPressed: () {
                 context.pushNamed(
-                  'videocall', 
-                  queryParameters: {'contact': user.fullName}
+                  'videocall',
+                  queryParameters: {'contact': user.fullName},
                 );
               },
-              icon: const Icon(Icons.videocam, color: AppConstants.primaryColor, size: 30),
+              icon: const Icon(
+                Icons.videocam,
+                color: AppConstants.primaryColor,
+                size: 30,
+              ),
             ),
           ],
         ),
@@ -192,14 +244,14 @@ class ActivitiesScreen extends ConsumerWidget {
     );
   }
 
- 
   Widget _buildBottomNavigation(BuildContext context, bool isDark) {
-     return Container(
+    return Container(
       decoration: BoxDecoration(
-        color: (isDark
-                ? AppConstants.backgroundDark
-                : AppConstants.backgroundColor)
-            .withOpacity(0.95),
+        color:
+            (isDark
+                    ? AppConstants.backgroundDark
+                    : AppConstants.backgroundColor)
+                .withOpacity(0.95),
         border: Border(
           top: BorderSide(
             color: isDark
@@ -269,8 +321,8 @@ class ActivitiesScreen extends ConsumerWidget {
             color: isActive
                 ? AppConstants.primaryColor
                 : (isDark
-                    ? AppConstants.hintColor.withOpacity(0.5)
-                    : AppConstants.textColor.withOpacity(0.5)),
+                      ? AppConstants.hintColor.withOpacity(0.5)
+                      : AppConstants.textColor.withOpacity(0.5)),
             size: 24,
           ),
           const SizedBox(height: 4),
@@ -281,8 +333,8 @@ class ActivitiesScreen extends ConsumerWidget {
               color: isActive
                   ? AppConstants.primaryColor
                   : (isDark
-                      ? AppConstants.hintColor.withOpacity(0.5)
-                      : AppConstants.textColor.withOpacity(0.5)),
+                        ? AppConstants.hintColor.withOpacity(0.5)
+                        : AppConstants.textColor.withOpacity(0.5)),
               fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
               fontFamily: 'Public Sans',
             ),

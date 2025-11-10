@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vinculo/models/user_model.dart';
 import 'package:vinculo/screens/elderly/active_volunteers_screen.dart';
 import 'package:vinculo/screens/elderly/activities_elderly_screen.dart';
 import 'package:vinculo/screens/elderly/home_elderly_screen.dart';
@@ -17,60 +18,61 @@ import 'package:vinculo/screens/volunteer/matches_screen.dart';
 import 'package:vinculo/screens/volunteer/profile_screen.dart';
 import 'package:vinculo/screens/volunteer/rewards_screen.dart';
 import 'package:vinculo/screens/volunteer/volunteer_home_screen.dart';
+import 'package:vinculo/screens/chat/chat_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
-  
+
   routes: [
     GoRoute(
       path: '/',
       name: 'landing',
       builder: (context, state) => const LandingPage(),
     ),
-    
+
     GoRoute(
       path: '/login',
       name: 'login',
       builder: (context, state) => const LoginScreen(),
     ),
-    
+
     GoRoute(
       path: '/registro',
       name: 'register',
       builder: (context, state) => const RegisterGeneralScreen(),
     ),
-    
+
     GoRoute(
       path: '/roles',
       name: 'roles',
       builder: (context, state) => const RoleSelectionScreen(),
     ),
-    
+
     GoRoute(
       path: '/settings',
       name: 'settings',
       builder: (context, state) => const SettingsScreen(),
     ),
-    
+
     GoRoute(
       path: '/volunteer',
-      redirect: (context, state) => '/volunteer/home', // Redirect a home por defecto
+      redirect: (context, state) =>
+          '/volunteer/home', // Redirect a home por defecto
     ),
-    
+
     GoRoute(
       path: '/volunteer/success',
       name: 'volunteer-success',
-      builder: (context, state) => const RegistrationSuccessScreen(
-        userType: 'volunteer',
-      ),
+      builder: (context, state) =>
+          const RegistrationSuccessScreen(userType: 'volunteer'),
     ),
-    
+
     GoRoute(
       path: '/volunteer/home',
       name: 'volunteer-home',
       builder: (context, state) => const VolunteerHomeScreen(),
     ),
-    
+
     GoRoute(
       path: '/volunteer/matches',
       name: 'matches',
@@ -81,25 +83,25 @@ final appRouter = GoRouter(
           name: 'contact-profile',
           builder: (context, state) {
             final contactId = state.pathParameters['contactId']!;
-            
+
             final contact = {
               'id': contactId,
               'name': state.uri.queryParameters['name'] ?? 'Usuario',
               'bio': state.uri.queryParameters['bio'] ?? 'Sin biografía',
             };
-            
+
             return ContactProfileScreen(contact: contact);
           },
         ),
       ],
     ),
-    
+
     GoRoute(
       path: '/volunteer/rewards',
       name: 'rewards',
       builder: (context, state) => const RewardsScreen(),
     ),
-    
+
     GoRoute(
       path: '/volunteer/profile',
       name: 'volunteer-profile',
@@ -112,26 +114,22 @@ final appRouter = GoRouter(
         ),
       ],
     ),
-    
-    GoRoute(
-      path: '/elderly',
-      redirect: (context, state) => '/elderly/home',
-    ),
-    
+
+    GoRoute(path: '/elderly', redirect: (context, state) => '/elderly/home'),
+
     GoRoute(
       path: '/elderly/success',
       name: 'elderly-success',
-      builder: (context, state) => const RegistrationSuccessScreen(
-        userType: 'elderly',
-      ),
+      builder: (context, state) =>
+          const RegistrationSuccessScreen(userType: 'elderly'),
     ),
-    
+
     GoRoute(
       path: '/elderly/home',
       name: 'elderly-home',
       builder: (context, state) => const HomeElderlyScreen(),
     ),
-    
+
     GoRoute(
       path: '/elderly/activities',
       name: 'activities-elderly',
@@ -145,13 +143,13 @@ final appRouter = GoRouter(
         ),
       ],
     ),
-    
+
     GoRoute(
       path: '/elderly/profile',
       name: 'elderly-profile',
       builder: (context, state) => const ProfileElderlyScreen(),
     ),
-    
+
     GoRoute(
       path: '/elderly/videocall',
       name: 'videocall',
@@ -160,9 +158,34 @@ final appRouter = GoRouter(
         return VideoCallScreen(contactName: contactName);
       },
     ),
+    GoRoute(
+      path: '/chat/:contactId/:connectionId',
+      name: 'chat',
+      builder: (context, state) {
+        final contactId = state.pathParameters['contactId']!;
+        final connectionId = state.pathParameters['connectionId']!;
+
+        // Necesitas pasar el UserModel completo
+        // Puedes obtenerlo desde un provider o desde queryParameters
+        final contactName = state.uri.queryParameters['name'] ?? 'Usuario';
+        final contactBio = state.uri.queryParameters['bio'] ?? '';
+
+        // Crear UserModel temporal (idealmente deberías cargarlo desde un provider)
+        final contact = UserModel(
+          id: contactId,
+          email: '',
+          fullName: contactName,
+          type: UserType.volunteer,
+          bio: contactBio,
+        );
+
+        return ChatScreen(contact: contact, connectionId: connectionId);
+      },
+    ),
   ],
-  
-  errorBuilder: (context, state) => Scaffold( body: Center(
+
+  errorBuilder: (context, state) => Scaffold(
+    body: Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
